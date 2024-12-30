@@ -32,6 +32,9 @@ export default function MobileNavigation() {
           <Link href="/" className="hover:text-foreground">
             Home
           </Link>
+          <Link href="https://stats.lavanet.xyz" className="hover:text-foreground">
+            Stats
+          </Link>
         </nav>
       </SheetContent>
     </Sheet>

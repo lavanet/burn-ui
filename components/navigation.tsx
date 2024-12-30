@@ -16,6 +16,9 @@ export default function Navigation() {
       <Link href="/" className="text-foreground transition-colors hover:text-foreground">
         Home
       </Link>
+      <Link href="https://stats.lavanet.xyz" className="hover:text-foreground">
+        Stats
+      </Link>
     </nav>
   );
 }
