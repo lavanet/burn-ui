@@ -18,12 +18,12 @@ export default function Data() {
       </CardHeader>
 
     <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 m-4">
-        <DataBox title="LAVA Burned" value="XXXXX" />
-        <DataBox title="Annualised LAVA Burn" value="XXXXX" />
-        <DataBox title="% of Total Supply Burned" value="XXXXX" />
-        <DataBox title="Annualized Burn Percentage" value="XXXXX" />
-        <DataBox title="Daily Burn Amount" value="XXXXX" />
-        <DataBox title="Current Supply" value="XXXXX" />
+        <DataBox title="LAVA Burned" value="14,911,406.3" />
+        <DataBox title="Annualised LAVA Burn" value=" 14,911,406.3" />
+        <DataBox title="% of Total Supply Burned" value="1.49%" />
+        <DataBox title="Annualized Burn Percentage" value="1.49%" />
+        <DataBox title="Daily Burn Amount" value="40,859.2014,910,608" />
+        <DataBox title="Current Supply" value="985,088,593.4" />
     </div>
 
     </Card>
