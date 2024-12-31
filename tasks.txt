@@ -8,4 +8,5 @@ done:
 waiting for oren:
 1. value for "Revenue (distributed to LAVA stackers)"
 2. daily burn rate amounts chart - save this daily - and then diff him?. link: https://jsinfo.lavanet.xyz/supply/total
+3. Revenue distribution to lava stackers section - where do i get this info
 
