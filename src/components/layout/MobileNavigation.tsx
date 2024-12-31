@@ -30,10 +30,10 @@ export default function MobileNavigation() {
             </Link>
           </Link>
           <Link href="/" className="hover:text-foreground">
-            Home
+            Burn Stats
           </Link>
           <Link href="https://stats.lavanet.xyz" className="hover:text-foreground">
-            Stats
+            Network Stats
           </Link>
         </nav>
       </SheetContent>

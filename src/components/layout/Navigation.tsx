@@ -14,10 +14,10 @@ export default function Navigation() {
         <span className="sr-only">Lava Network</span>
       </Link>
       <Link href="/" className="text-foreground transition-colors hover:text-foreground">
-        Home
+        Burn Stats
       </Link>
       <Link href="https://stats.lavanet.xyz" className="hover:text-foreground">
-        Stats
+        Network Stats
       </Link>
     </nav>
   );
