@@ -17,3 +17,6 @@ install:
 
 macos_kill:
 	lsof -ti:5200 | xargs kill -9
+
+gen_revenue_distributed_to_lava_stackers:
+	python3 scripts/gen_revenue_distributed_to_lava_stackers.py
