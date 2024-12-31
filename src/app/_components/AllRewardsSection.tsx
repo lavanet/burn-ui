@@ -7,7 +7,7 @@ import { CardHeader, CardTitle } from '@burn/components/ui/card';
 import { FormatDollarValue } from '@burn/lib/formatting';
 
 // Function to get total rewards
-export const getTotalRewards = (): string => {
+export const GetTotalRewards = (): string => {
     return rewardsData.totals.total_rewards;
 };
 
@@ -65,13 +65,24 @@ const AllRewardsSection = () => {
 
             {/* Totals Section */}
             <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {Object.entries(rewardsData.totals).map(([key, value]) => (
-                    <DataBox
-                        key={key}
-                        title={key.replace(/_/g, ' ')}
-                        value={FormatDollarValue(value)}
-                    />
-                ))}
+                {Object.entries(rewardsData.totals)
+                    // Filter out total_rewards first
+                    .filter(([key]) => key !== 'total_rewards')
+                    // Then map the remaining entries
+                    .map(([key, value]) => (
+                        <DataBox
+                            key={key}
+                            title={key.replace(/_/g, ' ')}
+                            value={FormatDollarValue(value)}
+                        />
+                    ))
+                }
+                {/* Add total_rewards last */}
+                {/* <DataBox
+                    key="total_rewards"
+                    title="total rewards"
+                    value={FormatDollarValue(rewardsData.totals.total_rewards)}
+                /> */}
             </div>
 
             {/* Tab Navigation */}
