@@ -2,9 +2,9 @@ done:
 1. make the title more prominent
 2. move burn % to be first - and make his title and content be bigger font
 3. remove - maybe unnessery card that was wrapping the data on the front page
+4. total supply distribution pie chart - using the https://jsinfo.lavanet.xyz/supply/total endpoint
 
-waiting:
-1. value for "Revenue (distributed to LAVA stackers)" - waiting for oren who is available in an hour
+waiting for oren:
+1. value for "Revenue (distributed to LAVA stackers)"
+2. daily burn rate amounts chart - save this daily - and then diff him?. link: https://jsinfo.lavanet.xyz/supply/total
 
-questions:
-1. daily burn rate amounts chart - save this daily - and then diff him: https://jsinfo.lavanet.xyz/supply/total

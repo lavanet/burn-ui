@@ -1,9 +1,9 @@
-run:
+localbe_run:
 	@export NEXT_PUBLIC_JSINFOBE_REST_URL=http://localhost:8081 && \
 	export PORT=5200 && \
 	pnpm dev
 
-mainnet_run:
+run:
 	@export NEXT_PUBLIC_JSINFOBE_REST_URL=https://jsinfo.mainnet.lavanet.xyz/ && \
 	export PORT=5200 && \
 	pnpm dev
@@ -16,4 +16,4 @@ install:
 	pnpm install
 
 macos_kill:
-	lsof -ti:5100 | xargs kill -9
+	lsof -ti:5200 | xargs kill -9
