@@ -3,6 +3,7 @@ done:
 2. move burn % to be first - and make his title and content be bigger font
 3. remove - maybe unnessery card that was wrapping the data on the front page
 4. total supply distribution pie chart - using the https://jsinfo.lavanet.xyz/supply/total endpoint
+5. fixed daily burn amount number - added tooltip 'Daily burn amount in LAVA'
 
 waiting for oren:
 1. value for "Revenue (distributed to LAVA stackers)"
