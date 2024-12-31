@@ -1,8 +1,8 @@
 // src/hooks/useJsinfobeFetch.tsx
 
-// this refetches things every x seconds and will not fetch if the component is not mounted
+'use client';
 
-import useSWR from "swr";
+import { default as useSWR } from 'swr';
 import { JsinfobeAxiosGet, AxiosApiResponse } from "../api-client/JsinfobeAxiosGet";
 
 const axiosFetcher = async (url: string) => {
