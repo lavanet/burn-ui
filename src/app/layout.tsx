@@ -38,7 +38,9 @@ export default function RootLayout({
         >
           <TooltipProvider>
             <div className="flex min-h-screen mx-auto max-w-screen-2xl flex-col">
-              <Header />
+              <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <Header />
+              </header>
               <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
                 {children}
               </main>

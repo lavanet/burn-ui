@@ -66,39 +66,41 @@ export function TotalSupplyPieChart({ burnedPercentage }: TotalSupplyPieChartPro
             <CardContent className="flex-1 pb-0">
                 <ThemeProvider theme={darkTheme}>
                     <CssBaseline />
-                    <PieChart
-                        series={[
-                            {
-                                arcLabel: (item) => `${((item.value / totalSupply) * 100).toFixed(1)}%`,
-                                arcLabelMinAngle: 45,
-                                data: pieData,
-                                highlightScope: { fade: 'global', highlight: 'item' },
-                                faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                                valueFormatter,
-                            },
-                        ]}
-                        margin={{ top: 10, bottom: 50, left: 10, right: 10 }}
-                        height={300}
-                        width={300}
-                        slotProps={{
-                            legend: {
-                                direction: 'row',
-                                position: { vertical: 'bottom', horizontal: 'middle' },
-                                padding: 0,
-                                itemMarkWidth: 10,
-                                itemMarkHeight: 10,
-                                markGap: 5,
-                                itemGap: 10,
-                                labelStyle: {
-                                    fill: '#FAFAFA',
-                                    fontSize: 12,
+                    <div className="relative z-0">
+                        <PieChart
+                            series={[
+                                {
+                                    arcLabel: (item) => `${((item.value / totalSupply) * 100).toFixed(1)}%`,
+                                    arcLabelMinAngle: 45,
+                                    data: pieData,
+                                    highlightScope: { fade: 'global', highlight: 'item' },
+                                    faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                                    valueFormatter,
                                 },
-                            },
-                        }}
-                        tooltip={{
-                            trigger: 'item'
-                        }}
-                    />
+                            ]}
+                            margin={{ top: 10, bottom: 50, left: 10, right: 10 }}
+                            height={300}
+                            width={300}
+                            slotProps={{
+                                legend: {
+                                    direction: 'row',
+                                    position: { vertical: 'bottom', horizontal: 'middle' },
+                                    padding: 0,
+                                    itemMarkWidth: 10,
+                                    itemMarkHeight: 10,
+                                    markGap: 5,
+                                    itemGap: 10,
+                                    labelStyle: {
+                                        fill: '#FAFAFA',
+                                        fontSize: 12,
+                                    },
+                                },
+                            }}
+                            tooltip={{
+                                trigger: 'item'
+                            }}
+                        />
+                    </div>
                 </ThemeProvider>
             </CardContent>
         </Card>
