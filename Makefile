@@ -1,15 +1,15 @@
 run:
-	@export NEXT_PUBLIC_REST_URL=http://localhost:8081 && \
+	@export NEXT_PUBLIC_JSINFOBE_REST_URL=http://localhost:8081 && \
 	export PORT=5200 && \
 	pnpm dev
 
 mainnet_run:
-	@export NEXT_PUBLIC_REST_URL=https://jsinfo.mainnet.lavanet.xyz/ && \
+	@export NEXT_PUBLIC_JSINFOBE_REST_URL=https://jsinfo.mainnet.lavanet.xyz/ && \
 	export PORT=5200 && \
 	pnpm dev
 
 build:
-	@export NEXT_PUBLIC_REST_URL=https://jsinfo.mainnet.lavanet.xyz/ && \
+	@export NEXT_PUBLIC_JSINFOBE_REST_URL=https://jsinfo.mainnet.lavanet.xyz/ && \
 	pnpm build
 
 install:

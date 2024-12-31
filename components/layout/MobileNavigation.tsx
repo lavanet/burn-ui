@@ -4,10 +4,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@burn/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@burn/components/ui/sheet';
 import Image from 'next/image';
-import lavaLogo from "@/public/lava.webp";
+import lavaLogo from "@burn/public/lava.webp";
 
 export default function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);

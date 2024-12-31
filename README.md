@@ -3,5 +3,5 @@
 First, run the development server:
 
 ```bash
-npm run dev
+make run
 ```

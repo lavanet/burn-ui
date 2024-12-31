@@ -1,0 +1,10 @@
+done:
+1. make the title more prominent
+2. move burn % to be first - and make his title and content be bigger font
+3. remove - maybe unnessery card that was wrapping the data on the front page
+
+waiting:
+1. value for "Revenue (distributed to LAVA stackers)" - waiting for oren who is available in an hour
+
+questions:
+1. daily burn rate amounts chart - save this daily - and then diff him: https://jsinfo.lavanet.xyz/supply/total

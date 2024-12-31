@@ -1,10 +1,10 @@
-import DataBox from "./databox";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
-import { Skeleton } from "./ui/skeleton";
+import DataBox from "@burn/components/databox";
+import { Card, CardHeader, CardTitle, CardContent } from "@burn/components/ui/card";
 
 import React from 'react';
+import { TotalSupplyPieChart } from "./TotalSupplyPieChart";
 
-export default function Data() {
+export default function LandingPageData() {
   return (
     <>
       <CardHeader className="flex flex-col items-center justify-center space-y-0 border-b py-7">
@@ -21,6 +21,8 @@ export default function Data() {
         <DataBox title="Daily Burn Amount" value="40,859.2014,910,608" />
         <DataBox title="Current Supply" value="985,088,593.4" />
       </div>
+
+      <TotalSupplyPieChart burnedPercentage={1.49} />
     </>
 
   );
