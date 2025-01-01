@@ -37,9 +37,9 @@ export default function LandingPageData() {
         <CurrentSupplyDataBox />
       </div>
 
-      {/* <TotalSupplyPieChart burnedPercentage={1.49} /> */}
+      <TotalSupplyPieChart burnedPercentage={1.49} />
 
-      <AllRewardsSection />
+      {/* <AllRewardsSection /> */}
     </>
 
   );
