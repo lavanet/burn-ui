@@ -36,3 +36,9 @@ yarn-error.log*
 next-env.d.ts
 
 .next
+
+scripts/consts.py
+
+midnight_blocks_*.json
+historical_blocks_*.json
+provider_rewards_*.json

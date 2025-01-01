@@ -20,3 +20,6 @@ macos_kill:
 
 gen_revenue_distributed_to_lava_stackers:
 	python3 scripts/gen_revenue_distributed_to_lava_stackers.py
+
+gen_daily_burn_rate_chart:
+	python3 scripts/gen_daily_burn_rate_chart.py

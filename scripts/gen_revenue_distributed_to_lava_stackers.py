@@ -8,6 +8,7 @@ import os
 from multiprocessing import Pool, cpu_count
 from functools import partial
 from tqdm import tqdm
+from consts import RPC_URL
 
 # Constants
 MIN_ACCEPTABLE_RATE = 1.e-7
@@ -145,7 +146,7 @@ def get_usd_value(amount: str, denom: str) -> str:
 
     return str(result)
 
-RPC_URL = ""
+RPC_URL = "https://internal-rpc-mainnet.lavanet.xyz:443"
 
 def run_lavad_command(command):
     try:        
