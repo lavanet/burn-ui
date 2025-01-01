@@ -52,7 +52,7 @@ export default function LandingPageData() {
             {/* <DataBox title="Annualized Burn Percentage" value="1.49%" /> */}
             <DataBox title="LAVA Burned" value="14,911,406.3" />
             <DataBox title="Annualised LAVA Burn" value="14,911,406.3" />
-            <DataBox title="Average Daily LAVA Burn Amount" value="40,859.2" tooltip="Average daily burn amount in LAVA" />
+            <DataBox title="Average Daily LAVA Burn" value="40,859.2" tooltip="Average daily burn amount in LAVA" />
             <CurrentTotalSupplyDataBox />
             <CurrentCirculatingSupplyDataBox />
           </div>

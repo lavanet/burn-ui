@@ -23,28 +23,9 @@ export function TotalSupplyPieChart({ burnedPercentage }: TotalSupplyPieChartPro
     const { data: totalSupplyStr, error, isLoading } = useJsinfobeFetch('supply/total');
     const { data: circulatingSupplyStr, error: circulatingSupplyError, isLoading: circulatingSupplyLoading } = useJsinfobeFetch('supply/circulating');
 
-    if (error || circulatingSupplyError) return <div>Failed to load supply data</div>;
-    if (isLoading || circulatingSupplyLoading) {
-        return (
-            <Card className="flex flex-col w-fit" style={{ height: '330px', width: '350px' }}>
-                <CardHeader className="items-center pb-0">
-                    <CardTitle>
-                        <div className="text-[15px] mb-1">Total Supply Distribution</div>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center flex-1">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                    <div className="mt-4 space-y-2">
-                        <Skeleton className="h-4 w-[200px]" />
-                        <Skeleton className="h-4 w-[150px]" />
-                    </div>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    const totalSupply = parseInt(totalSupplyStr || '0');
-    const circulatingSupply = parseInt(circulatingSupplyStr || '0');
+    // Use default values if loading or error
+    const totalSupply = parseInt(totalSupplyStr || '985088593');
+    const circulatingSupply = parseInt(circulatingSupplyStr || '277075327');
     const burnedAmount = (totalSupply * burnedPercentage) / 100;
     const lockedSupply = totalSupply - burnedAmount - circulatingSupply;
 

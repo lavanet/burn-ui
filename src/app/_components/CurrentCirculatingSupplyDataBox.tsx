@@ -10,11 +10,19 @@ export function CurrentCirculatingSupplyDataBox() {
     const { data, isLoading, error } = useJsinfobeFetch<string>('supply/circulating');
 
     if (isLoading) {
-        <LoadingIndicator loadingText="Loading supply" />
+        return <DataBox
+            title="Circulating LAVA Supply"
+            value="277,075,327"
+            tooltip="Current circulating supply of LAVA tokens in LAVA"
+        />
     }
 
     if (error || !IsMeaningfulText(data + "") || !parseFloat(data + "")) {
-        <ErrorDisplay message="Failed to load supply" />
+        return <DataBox
+            title="Circulating LAVA Supply"
+            value="277,075,327"
+            tooltip="Current circulating supply of LAVA tokens in LAVA"
+        />
     }
 
     const formattedSupply = FormatNumber(Number(data));

@@ -10,11 +10,19 @@ export function CurrentTotalSupplyDataBox() {
     const { data, isLoading, error } = useJsinfobeFetch<string>('supply/total');
 
     if (isLoading) {
-        <LoadingIndicator loadingText="Loading supply" />
+        return <DataBox
+            title="Total LAVA Supply"
+            value="985,088,593"
+            tooltip="Current total supply of LAVA tokens in LAVA"
+        />
     }
 
     if (error || !IsMeaningfulText(data + "") || !parseFloat(data + "")) {
-        <ErrorDisplay message="Failed to load supply" />
+        return <DataBox
+            title="Total LAVA Supply"
+            value="985,088,593"
+            tooltip="Current total supply of LAVA tokens in LAVA"
+        />
     }
 
     const formattedSupply = FormatNumber(Number(data));
