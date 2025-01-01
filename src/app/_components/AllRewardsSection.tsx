@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import rewardsData from './all_rewards.json';
-import DataBox from '@burn/components/databox';
+import { DataBox } from '@burn/components/databox';
 import { CardHeader, CardTitle } from '@burn/components/ui/card';
 import { FormatDollarValue } from '@burn/lib/formatting';
 

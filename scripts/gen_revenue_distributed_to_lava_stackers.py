@@ -231,35 +231,34 @@ def get_validator_rewards(validator_address):
     outstanding = run_lavad_command(f"lavad q distribution validator-outstanding-rewards {validator_address}")
     
     total_rewards = 0.0
+    rewards_info = []
     
     # Process self bond rewards from distribution info
     if dist_info and "self_bond_rewards" in dist_info:
-        try:
-            for reward in dist_info["self_bond_rewards"]:
-                total_rewards += process_reward(reward)
-        except Exception as e:
-            print(f"Error processing self bond rewards: {e}")
-            print(f"self_bond_rewards: {json.dumps(dist_info.get('self_bond_rewards'), indent=2)}")
+        rewards_data = process_rewards({"rewards": [{"reward": dist_info["self_bond_rewards"]}]})
+        total_rewards += rewards_data["total_usd"]
+        rewards_info.extend(rewards_data["tokens"])
     
     # Process outstanding rewards
     if outstanding and "rewards" in outstanding:
-        try:
-            for reward in outstanding["rewards"]:
-                total_rewards += process_reward(reward)
-        except Exception as e:
-            print(f"Error processing outstanding rewards: {e}")
-            print(f"rewards: {json.dumps(outstanding.get('rewards'), indent=2)}")
+        rewards_data = process_rewards({"rewards": [{"reward": outstanding["rewards"]}]})
+        total_rewards += rewards_data["total_usd"]
+        rewards_info.extend(rewards_data["tokens"])
     
-    return total_rewards
+    return {
+        "total_usd": total_rewards,
+        "tokens": rewards_info
+    }
 
-def get_validator_delegators_rewards(validator_address: str) -> float:
+def get_validator_delegators_rewards(validator_address: str) -> Dict:
     """Get total rewards for all delegators of a validator"""
     total_rewards = 0.0
+    all_tokens = []
     
     # Get list of delegators
     delegators = run_lavad_command(f"lavad query staking delegations-to {validator_address}")
     if not delegators or "delegation_responses" not in delegators:
-        return total_rewards
+        return {"total_usd": 0, "tokens": []}
         
     print(f"Processing {len(delegators['delegation_responses'])} delegators for {validator_address}")
     
@@ -270,72 +269,55 @@ def get_validator_delegators_rewards(validator_address: str) -> float:
             f"lavad query distribution rewards {delegator_addr} {validator_address}"
         )
         
-        if rewards_response and "rewards" in rewards_response:
-            for reward in rewards_response["rewards"]:
-                total_rewards += process_reward(reward)
+        if rewards_response:
+            rewards_data = process_rewards(rewards_response)
+            total_rewards += rewards_data["total_usd"]
+            all_tokens.extend(rewards_data["tokens"])
                 
-    return total_rewards
+    return {
+        "total_usd": total_rewards,
+        "tokens": all_tokens
+    }
 
-def get_provider_rewards(provider_address: str) -> float:
+def get_provider_rewards(provider_address: str) -> Dict:
     """Get rewards for a provider using recommended block height"""
     try:
-        # Get initial response to get recommended block
         initial_response = run_lavad_command(
             f"lavad q subscription estimated-provider-rewards {provider_address}"
         )
-        # print(f"Initial response: {json.dumps(initial_response, indent=2)}")
         
         if not initial_response:
-            print(f"No initial response for provider {provider_address}")
-            return 0.0
+            return {"total_usd": 0, "tokens": []}
             
-        # Check for the specific error message
-        if isinstance(initial_response, dict) and "message" in initial_response:
-            if "cannot estimate rewards, cannot get claim" in initial_response["message"]:
-                print(f"No claimable rewards for provider {provider_address}")
-                return 0.0
-        
         # Handle case where response has info/total structure
         if "info" in initial_response and "total" in initial_response:
-            total_rewards = 0.0
-            for reward in initial_response["total"]:
-                total_rewards += process_reward(reward)
-            return total_rewards
+            return process_rewards({"rewards": [{"reward": initial_response["total"]}]})
             
         if "recommended_block" not in initial_response:
-            print(f"No recommended block in response for provider {provider_address}")
-            print(f"Response: {json.dumps(initial_response, indent=2)}")
-            return 0.0
+            return {"total_usd": 0, "tokens": []}
             
         # Get rewards at recommended block height minus 1
         block_height = int(initial_response["recommended_block"]) - 1
-        print(f"Getting rewards at block height {block_height}")
         
         response = run_lavad_command(
             f"lavad q subscription estimated-provider-rewards {provider_address} --height {block_height}"
         )
         
         if not response:
-            print(f"No response for provider {provider_address} at height {block_height}")
-            return 0.0
+            return {"total_usd": 0, "tokens": []}
             
         # Handle case where response has info/total structure
         if "info" in response and "total" in response:
-            total_rewards = 0.0
-            for reward in response["total"]:
-                total_rewards += process_reward(reward)
-            return total_rewards
+            return process_rewards({"rewards": [{"reward": response["total"]}]})
             
         if "rewards" not in response:
-            print(f"No rewards in response for provider {provider_address}")
-            print(f"Response: {json.dumps(response, indent=2)}")
-            return 0.0
+            return {"total_usd": 0, "tokens": []}
             
-        return process_reward(response["rewards"])
+        return process_rewards({"rewards": [{"reward": [response["rewards"]]}]})
         
     except Exception as e:
         print(f"Error getting provider rewards for {provider_address}: {e}")
-        return 0.0
+        return {"total_usd": 0, "tokens": []}
 
 def get_provider_delegators_rewards(provider_address: str) -> float:
     """Get total rewards for all delegators of a provider"""
@@ -427,8 +409,10 @@ def process_validator_parallel(validator: str) -> Dict:
     
     return {
         "validator": validator,
-        "validator_rewards": validator_rewards,
-        "delegator_rewards": delegator_rewards
+        "validator_rewards": validator_rewards["total_usd"],
+        "validator_tokens": validator_rewards["tokens"],
+        "delegator_rewards": delegator_rewards["total_usd"],
+        "delegator_tokens": delegator_rewards["tokens"]
     }
 
 def process_provider_parallel(args) -> Dict:
@@ -438,25 +422,27 @@ def process_provider_parallel(args) -> Dict:
         provider_addr = provider["address"]
         print(f"\nProcessing provider {index + 1}/{total}: {provider_addr}")
         
-        # Get provider rewards with debug info
         provider_rewards = get_provider_rewards(provider_addr)
-        print(f"Provider rewards: ${provider_rewards:.2f}")
+        print(f"Provider rewards: ${provider_rewards['total_usd']:.2f}")
         
-        # Get delegator rewards with debug info
         delegator_rewards = get_provider_delegators_rewards(provider_addr)
-        print(f"Provider delegator rewards: ${delegator_rewards:.2f}")
+        print(f"Provider delegator rewards: ${delegator_rewards['total_usd']:.2f}")
 
         return {
             "provider": provider_addr,
-            "provider_rewards": provider_rewards,
-            "delegator_rewards": delegator_rewards
+            "provider_rewards": provider_rewards["total_usd"],
+            "provider_tokens": provider_rewards["tokens"],
+            "delegator_rewards": delegator_rewards["total_usd"],
+            "delegator_tokens": delegator_rewards["tokens"]
         }
     except Exception as e:
         print(f"\nError processing provider {provider.get('address', 'unknown')}: {e}")
         return {
             "provider": provider.get('address', 'unknown'),
             "provider_rewards": 0.0,
-            "delegator_rewards": 0.0
+            "provider_tokens": [],
+            "delegator_rewards": 0.0,
+            "delegator_tokens": []
         }
 
 def get_providers() -> list:
@@ -476,23 +462,49 @@ def get_providers() -> list:
         print(f"Error fetching providers: {e}")
         return []
 
+def process_rewards(rewards_response: Dict) -> Dict:
+    """Process rewards response with detailed token information"""
+    total_usd = 0
+    tokens_info = []
+    
+    for reward in rewards_response.get("rewards", []):
+        for coin in reward.get("reward", []):
+            amount = float(coin["amount"])
+            denom = coin["denom"]
+            
+            # Skip tiny amounts
+            if amount < DENOM_LOWEST_LIMIT_WARNING:
+                continue
+                
+            usd_value = get_usd_value(amount, denom)
+            
+            # Store detailed token info
+            tokens_info.append({
+                "denom": denom,
+                "amount": amount,
+                "value_usd": usd_value
+            })
+            
+            total_usd += usd_value
+    
+    return {
+        "total_usd": total_usd,
+        "tokens": tokens_info
+    }
+
 def main():
     print("\nFetching validators...")
     validators = get_all_validators()
     print(f"Found {len(validators)} validators")
     
     all_results = {
+        "generated_at": datetime.now().isoformat(),
         "totals": {
-            "validator_rewards": 0.0,
-            "validator_delegator_rewards": 0.0,
-            "provider_rewards": 0.0,
-            "provider_delegator_rewards": 0.0,
-            "total_rewards": 0.0
+            "total_rewards": 0,
+            "provider_rewards": 0,
+            "provider_delegator_rewards": 0
         },
-        "validator_rewards": [],
-        "validator_delegators": [],
-        "provider_rewards": [],
-        "provider_delegators": []
+        "providers": []
     }
     
     # Process validators in parallel
@@ -578,6 +590,9 @@ def main():
         all_results["totals"][key] for key in all_results["totals"] 
         if key != "total_rewards"
     )
+    
+    # Keep raw values for totals
+    all_results["totals_raw"] = {k: v for k, v in all_results["totals"].items()}
     
     # Format totals as strings with $ prefix
     for key in all_results["totals"]:
