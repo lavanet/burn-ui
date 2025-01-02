@@ -31,7 +31,7 @@ export default function LandingPageData() {
           <DataBox
             title="Revenue distributed (to stakers)"
             value="$1.06M"
-            tooltip="Total rewards distributed to LAVA stackers in USD"
+            tooltip="Total rewards distributed to LAVA stakers in USD"
             largeValueText={true}
             className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 h-full"
           />
@@ -42,13 +42,13 @@ export default function LandingPageData() {
         <Card style={{ margin: '15px' }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 gap-y-0">
 
-            <DataBox title="Already distributed" value="$420K USD" tooltip="Distributed rewards to LAVA stackers in USD on mainnet and testnet" />
+            <DataBox title="Already distributed" value="$420K USD" tooltip="Distributed rewards to LAVA stakers in USD on mainnet and testnet" />
 
             {/* <DataBox
           key="total_rewards"
           title="Revenue"
           value={FormatDollarValue(GetTotalRewards())}
-          tooltip="Revenue distributed to LAVA stackers"
+          tooltip="Revenue distributed to LAVA stakers"
         /> */}
             {/* <DataBox title="Annualized Burn Percentage" value="1.49%" /> */}
             <DataBox title="LAVA Burned" value="14,911,406.3" />

@@ -6,15 +6,15 @@ done:
 5. fixed daily burn amount number - added tooltip 'Daily burn amount in LAVA'
 
 waiting for oren:
-1. value for "Revenue (distributed to LAVA stackers)"
+1. value for "Revenue (distributed to LAVA stakers)"
 2. daily burn rate amounts chart - save this daily - and then diff him?. link: https://jsinfo.lavanet.xyz/supply/total
-3. Revenue distribution to lava stackers section - where do i get this info
+3. Revenue distribution to lava stakers section - where do i get this info
 
 
 
-should stackers includes delegators - 
+should stakers includes delegators - 
 
-Do the stackers include both provider and validators - or only providers ?
+Do the stakers include both provider and validators - or only providers ?
 should i include delegators ?
 
 validators - dont know - oren needs to check if it's possible 
