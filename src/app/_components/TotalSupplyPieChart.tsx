@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@burn/components/ui/ca
 import { Skeleton } from "@burn/components/ui/skeleton"
 import { Loader2 } from "lucide-react"
 import { useJsinfobeFetch } from '@burn/fetching/jsinfobe/hooks/useJsinfobeFetch'
+import { PieChart as PieChartIcon } from "lucide-react"
 
 const darkTheme = createTheme({
     palette: {
@@ -56,16 +57,20 @@ export function TotalSupplyPieChart({ burnedPercentage }: TotalSupplyPieChartPro
     };
 
     return (
-        <Card className="flex flex-col w-full">
-            <CardHeader className="items-center pb-2 pt-10">
-                <CardTitle>
-                    <div className="text-2xl mb-2">LAVA Supply Distribution</div>
+        <Card className="w-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div className="flex-1" />
+                <CardTitle className="text-lg font-large text-center" style={{ fontSize: '1.2rem' }}>
+                    Total Supply Distribution
                 </CardTitle>
+                <div className="flex-1 flex justify-end">
+                    <PieChartIcon className="h-5 w-5 text-muted-foreground" />
+                </div>
             </CardHeader>
-            <CardContent className="flex-1 pb-8">
+            <CardContent className="flex-1 pb-0" style={{ marginBottom: '30px' }}>
                 <ThemeProvider theme={darkTheme}>
                     <CssBaseline />
-                    <div className="relative z-0 flex justify-center">
+                    <div className="relative z-0 flex justify-center w-full">
                         <PieChart
                             series={[
                                 {
@@ -78,8 +83,13 @@ export function TotalSupplyPieChart({ burnedPercentage }: TotalSupplyPieChartPro
                                 },
                             ]}
                             margin={{ top: 20, bottom: 80, left: 20, right: 20 }}
-                            height={600}
-                            width={900}
+                            height={400}
+                            width={undefined}
+                            sx={{
+                                width: '100%',
+                                height: 'auto',
+                                maxWidth: '100%'
+                            }}
                             slotProps={{
                                 legend: {
                                     direction: 'row',

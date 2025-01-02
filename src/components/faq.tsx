@@ -4,6 +4,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@burn/components/ui/accordion"
+import { HelpCircle } from "lucide-react";
 
 export type FAQItem = {
     question: string;
@@ -13,7 +14,10 @@ export type FAQItem = {
 export function FAQ({ faqList: faqList, className }: { faqList: FAQItem[], className?: string }) {
     return (
         <Accordion type="single" collapsible className={className}>
-            <h4>FAQ:</h4>
+            <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-medium">FAQ:</h4>
+                <HelpCircle className="h-5 w-5 text-muted-foreground" />
+            </div>
             {faqList.length > 0 ? (
                 faqList.map(({ question, answer }) => (
                     <AccordionItem key={question} value={question}>
