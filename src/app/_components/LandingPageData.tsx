@@ -41,7 +41,8 @@ export default function LandingPageData() {
         {/* Rest of the boxes in grid */}
         <Card style={{ margin: '15px' }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 gap-y-0">
-            <DataBox title="Already distributed" value="$413,416" tooltip="Distributed rewards to LAVA stackers in USD" />
+
+            <DataBox title="Already distributed" value="$420K USD" tooltip="Distributed rewards to LAVA stackers in USD on mainnet and testnet" />
 
             {/* <DataBox
           key="total_rewards"
