@@ -46,10 +46,7 @@ scripts/__pycache__/*
 midnight_blocks_*.json
 historical_blocks_*.json
 provider_rewards_*.json
-<<<<<<< HEAD
 
 scripts/__pycache__/*
 scripts/cache/
-=======
 all_rewards_*.json
->>>>>>> scripts

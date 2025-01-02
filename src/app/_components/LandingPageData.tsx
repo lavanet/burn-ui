@@ -49,7 +49,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
             value="$1.06M"
             icon={<Coins className="h-4 w-4" />}
             subtext="Updated daily"
-            tooltip="Total rewards distributed to LAVA stackers in USD"
+            tooltip="Total rewards distributed to LAVA stakers in USD"
             largeValueText={true}
             className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 h-full"
           />
@@ -59,27 +59,12 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
         {/* Rest of the boxes in grid */}
         <Card style={{ margin: '15px' }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 gap-y-0">
-<<<<<<< HEAD
-
-            <DataBox title="Already distributed" value="$420K USD" tooltip="Distributed rewards to LAVA stackers in USD on mainnet and testnet" />
-
-            {/* <DataBox
-          key="total_rewards"
-          title="Revenue"
-          value={FormatDollarValue(GetTotalRewards())}
-          tooltip="Revenue distributed to LAVA stackers"
-        /> */}
-            {/* <DataBox title="Annualized Burn Percentage" value="1.49%" /> */}
-            <DataBox title="LAVA Burned" value="14,911,406.3" />
-            <DataBox title="Annualised LAVA Burn" value="14,911,406.3" />
-            <DataBox title="Average Daily LAVA Burn" value="40,859.2" tooltip="Average daily burn amount in LAVA" />
-=======
             <DataBox
               title="Already distributed"
-              value="$413,416"
+              value="$420K USD"
+              tooltip="Distributed rewards to LAVA stakers in USD on mainnet and testnet"
               icon={<CircleDollarSign className="h-4 w-4" />}
               subtext="Updated daily"
-              tooltip="Distributed rewards to LAVA stackers in USD"
             />
             <DataBox
               title="LAVA Burned"
@@ -100,11 +85,10 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
               subtext="Updated daily"
               tooltip="Average daily burn amount in LAVA"
             />
->>>>>>> scripts
             <CurrentTotalSupplyDataBox />
             <CurrentCirculatingSupplyDataBox />
-          </div>
-        </Card>
+          </div >
+        </Card >
 
         <div style={{ marginTop: '40px' }}></div>
 
@@ -117,7 +101,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
           <FAQ faqList={faqList} className="w-full" />
         </div>
 
-      </div>
+      </div >
     </>
   );
 }
