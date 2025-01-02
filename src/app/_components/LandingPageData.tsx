@@ -1,21 +1,35 @@
 "use client"
 
 import { DataBox } from "@burn/components/databox";
-import { Card, CardHeader, CardTitle, CardContent } from "@burn/components/ui/card";
-
+import { Card, CardHeader, CardTitle, CardDescription } from "@burn/components/ui/card";
+import {
+  Flame,
+  CircleDollarSign,
+  TrendingUp,
+  Calendar,
+  CircleOff,
+  Coins,
+} from "lucide-react";
 import React from 'react';
 import { TotalSupplyPieChart } from "./TotalSupplyPieChart";
 import { CurrentTotalSupplyDataBox } from "./CurrentTotalSupplyDataBox";
-// import AllRewardsSection, { GetTotalRewards } from "./AllRewardsSection";
-// import { FormatDollarValue } from "@burn/lib/formatting";
 import { CurrentCirculatingSupplyDataBox } from "./CurrentCirculatingSupplyDataBox";
+import { FAQ, FAQItem } from "@burn/components/faq";
 
 export default function LandingPageData() {
+  const faqList: FAQItem[] = [
+    {
+      question: "How does the burn mechanism work?",
+      answer: `Lava has 6.6% of total supply allocated towards incentivizing data providers to join in the early stages of the protocol, when there is less paid demand. This is distributed over 4 years, monthly. Each month, the LAVA allocation is distributed depending on paid demand. Any LAVA allocation not distributed is burned.
+
+In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on Lava RPC demand`
+    },
+  ];
   return (
     <>
       <CardHeader className="flex flex-col items-center justify-center border-b py-3">
         <CardTitle className="text-3xl font-bold text-center mt-0 mb-3">
-          LAVA Token Burn Statistics
+          LAVA Burn & Revenue Statistic
         </CardTitle>
       </CardHeader>
 
@@ -25,12 +39,16 @@ export default function LandingPageData() {
           <DataBox
             title="Burn % of total supply"
             value="1.49%"
+            icon={<Flame className="h-4 w-4" />}
+            subtext="Updated daily"
             largeValueText={true}
             className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/30 h-full"
           />
           <DataBox
             title="Revenue distributed (to stakers)"
             value="$1.06M"
+            icon={<Coins className="h-4 w-4" />}
+            subtext="Updated daily"
             tooltip="Total rewards distributed to LAVA stackers in USD"
             largeValueText={true}
             className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 h-full"
@@ -41,6 +59,7 @@ export default function LandingPageData() {
         {/* Rest of the boxes in grid */}
         <Card style={{ margin: '15px' }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 gap-y-0">
+<<<<<<< HEAD
 
             <DataBox title="Already distributed" value="$420K USD" tooltip="Distributed rewards to LAVA stackers in USD on mainnet and testnet" />
 
@@ -54,6 +73,34 @@ export default function LandingPageData() {
             <DataBox title="LAVA Burned" value="14,911,406.3" />
             <DataBox title="Annualised LAVA Burn" value="14,911,406.3" />
             <DataBox title="Average Daily LAVA Burn" value="40,859.2" tooltip="Average daily burn amount in LAVA" />
+=======
+            <DataBox
+              title="Already distributed"
+              value="$413,416"
+              icon={<CircleDollarSign className="h-4 w-4" />}
+              subtext="Updated daily"
+              tooltip="Distributed rewards to LAVA stackers in USD"
+            />
+            <DataBox
+              title="LAVA Burned"
+              value="14,911,406.3"
+              icon={<CircleOff className="h-4 w-4" />}
+              subtext="Updated daily"
+            />
+            <DataBox
+              title="Annualised LAVA Burn"
+              value="14,911,406.3"
+              icon={<TrendingUp className="h-4 w-4" />}
+              subtext="Updated daily"
+            />
+            <DataBox
+              title="Average Daily LAVA Burn"
+              value="40,859.2"
+              icon={<Calendar className="h-4 w-4" />}
+              subtext="Updated daily"
+              tooltip="Average daily burn amount in LAVA"
+            />
+>>>>>>> scripts
             <CurrentTotalSupplyDataBox />
             <CurrentCirculatingSupplyDataBox />
           </div>
@@ -66,8 +113,11 @@ export default function LandingPageData() {
           <TotalSupplyPieChart burnedPercentage={1.49} />
         </div>
 
-        {/* <AllRewardsSection /> */}
-      </div >
+        <div className="flex justify-center w-full mt-10 ml-6" style={{ paddingRight: '50px' }}>
+          <FAQ faqList={faqList} className="w-full" />
+        </div>
+
+      </div>
     </>
   );
 }

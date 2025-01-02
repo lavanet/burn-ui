@@ -5,7 +5,6 @@ from typing import Dict, Optional, List, Tuple
 from tqdm import tqdm
 import argparse
 import sys
-import time
 from consts import RPC_URL
 from multiprocessing import Pool, cpu_count
 
