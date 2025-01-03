@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "@burn/lib/utils"
 import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react"
 
-export type SortDirection = "asc" | "desc" | null
+type SortDirection = "asc" | "desc" | null
 
 interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
     sortable?: boolean
@@ -227,5 +227,5 @@ export {
     TableRow,
     TableCell,
     TableCaption,
-    type SortDirection,
+    SortDirection
 }
