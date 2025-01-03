@@ -50,3 +50,15 @@ provider_rewards_*.json
 scripts/__pycache__/*
 scripts/cache/
 all_rewards_*.json
+
+validator_delegator_rewards_*.json
+validator_rewards_*.json
+provider_delegator_rewards_*.json
+all_rewards_*.json
+
+all_rewards_20250102_125913.json
+all_rewards_latest.json
+
+scripts/__pycache__/*
+scripts/__pycache__/**/*
+scripts/__pycache__/consts.cpython-311.pyc

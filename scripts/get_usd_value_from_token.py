@@ -1,54 +1,75 @@
 import os
 import json
 import time
-from typing import Tuple
-import requests
+from typing import Dict, List, Tuple, Union, TypedDict
 from run_lavad_command import run_lavad_command
 from local_disk_cache import get_cache_path, is_cache_valid, load_from_cache, save_to_cache
 
 # Constants
-MIN_ACCEPTABLE_RATE = 1.e-7
-MAX_ACCEPTABLE_RATE = 100000
-DENOM_LOWEST_LIMIT_WARNING = 1.e-20
-DENOM_HIGHEST_LIMIT_ERROR = 10_000_000_000_000  # Using testnet value
+MIN_ACCEPTABLE_RATE: float = 1.e-7
+MAX_ACCEPTABLE_RATE: float = 100000
+DENOM_LOWEST_LIMIT_WARNING: float = 1.e-20
+DENOM_HIGHEST_LIMIT_ERROR: float = 10_000_000_000_000  # Using testnet value
+
+class DenomConversion(TypedDict):
+    baseDenom: str
+    factor: int
+
+class CoinGeckoRate(TypedDict):
+    rate: float
+    timestamp: float
+
+class TokenAmount(TypedDict):
+    amount: Union[str, float]
+    denom: str
+
+class ProcessedToken(TypedDict):
+    amount: str
+    denom: str
+    original_denom: str
+    value_usd: str
+
+class ProcessedTokenArray(TypedDict):
+    tokens: List[ProcessedToken]
+    total_usd: float
 
 # Get script directory and construct path to denom map
-script_dir = os.path.dirname(os.path.abspath(__file__))
-denom_map_path = os.path.join(script_dir, "CoinGekoDenomMap.json")
+script_dir: str = os.path.dirname(os.path.abspath(__file__))
+denom_map_path: str = os.path.join(script_dir, "CoinGekoDenomMap.json")
 
 # Load denom mappings
 try:
     with open(denom_map_path, "r") as f:
-        DENOM_MAP = json.load(f)
+        DENOM_MAP: Dict[str, str] = json.load(f)
 except FileNotFoundError:
     print(f"Error: Could not find CoinGekoDenomMap.json at {denom_map_path}")
     DENOM_MAP = {}
 
-DENOM_CONVERSIONS = {
+DENOM_CONVERSIONS: Dict[str, DenomConversion] = {
     "ulava": {"baseDenom": "lava", "factor": 1_000_000},
     "uatom": {"baseDenom": "atom", "factor": 1_000_000},
-    "ustars": {"baseDenom": "stars", "factor": 1_000_000},          # Stargaze (STARS)
-    "uakt": {"baseDenom": "akt", "factor": 1_000_000},             # Akash (AKT)
-    "uhuahua": {"baseDenom": "huahua", "factor": 1_000_000},       # Chihuahua (HUAHUA)
-    "uevmos": {"baseDenom": "evmos", "factor": 1_000_000_000_000_000_000},  # Evmos (EVMOS)
-    "inj": {"baseDenom": "inj", "factor": 1_000_000_000_000_000_000},       # Injective (INJ)
-    "aevmos": {"baseDenom": "evmos", "factor": 1_000_000_000_000_000_000},  # Evmos (EVMOS)
-    "basecro": {"baseDenom": "cro", "factor": 100_000_000},        # Crypto.com (CRO)
-    "uscrt": {"baseDenom": "scrt", "factor": 1_000_000},           # Secret (SCRT)
-    "uiris": {"baseDenom": "iris", "factor": 1_000_000},           # IRISnet (IRIS)
-    "uregen": {"baseDenom": "regen", "factor": 1_000_000},         # Regen (REGEN)
-    "uion": {"baseDenom": "ion", "factor": 1_000_000},             # Ion (ION)
-    "nanolike": {"baseDenom": "like", "factor": 1_000_000_000},    # LikeCoin (LIKE)
-    "uaxl": {"baseDenom": "axl", "factor": 1_000_000},             # Axelar (AXL)
-    "uband": {"baseDenom": "band", "factor": 1_000_000},           # Band Protocol (BAND)
-    "ubld": {"baseDenom": "bld", "factor": 1_000_000},             # Agoric (BLD)
-    "ucmdx": {"baseDenom": "cmdx", "factor": 1_000_000},           # COMDEX (CMDX)
-    "ucre": {"baseDenom": "cre", "factor": 1_000_000},             # Crescent (CRE)
-    "uxprt": {"baseDenom": "xprt", "factor": 1_000_000},           # Persistence (XPRT)
-    "uusdc": {"baseDenom": "usdc", "factor": 1_000_000},           # USD Coin (USDC)
+    "ustars": {"baseDenom": "stars", "factor": 1_000_000},
+    "uakt": {"baseDenom": "akt", "factor": 1_000_000},
+    "uhuahua": {"baseDenom": "huahua", "factor": 1_000_000},
+    "uevmos": {"baseDenom": "evmos", "factor": 1_000_000_000_000_000_000},
+    "inj": {"baseDenom": "inj", "factor": 1_000_000_000_000_000_000},
+    "aevmos": {"baseDenom": "evmos", "factor": 1_000_000_000_000_000_000},
+    "basecro": {"baseDenom": "cro", "factor": 100_000_000},
+    "uscrt": {"baseDenom": "scrt", "factor": 1_000_000},
+    "uiris": {"baseDenom": "iris", "factor": 1_000_000},
+    "uregen": {"baseDenom": "regen", "factor": 1_000_000},
+    "uion": {"baseDenom": "ion", "factor": 1_000_000},
+    "nanolike": {"baseDenom": "like", "factor": 1_000_000_000},
+    "uaxl": {"baseDenom": "axl", "factor": 1_000_000},
+    "uband": {"baseDenom": "band", "factor": 1_000_000},
+    "ubld": {"baseDenom": "bld", "factor": 1_000_000},
+    "ucmdx": {"baseDenom": "cmdx", "factor": 1_000_000},
+    "ucre": {"baseDenom": "cre", "factor": 1_000_000},
+    "uxprt": {"baseDenom": "xprt", "factor": 1_000_000},
+    "uusdc": {"baseDenom": "usdc", "factor": 1_000_000},
 }
 
-INITIAL_RATES = {
+INITIAL_RATES: Dict[str, float] = {
     "evmos": 0.02137148,
     "axl-inu": 0.00001604,
     "lava-network": 0.128505,
@@ -58,7 +79,15 @@ INITIAL_RATES = {
 }
 
 def get_denom_trace(denom: str) -> str:
-    """Get base denom from IBC denom trace with caching"""
+    """
+    Get base denom from IBC denom trace with caching
+    
+    Args:
+        denom: The IBC denom to trace
+        
+    Returns:
+        str: The base denom
+    """
     if not denom.startswith("ibc/"):
         return denom
         
@@ -139,15 +168,27 @@ class CoinGeckoCache:
             return 0
 
 def convert_to_base_denom(amount: str, denom: str) -> Tuple[str, str]:
-    """Convert amount and denom to base denomination"""
+    """
+    Convert amount and denom to base denomination
+    
+    Args:
+        amount: The token amount as string
+        denom: The token denomination
+        
+    Returns:
+        Tuple[str, str]: (base_amount, base_denom)
+        
+    Raises:
+        ValueError: If denom is not a string
+    """
     if not isinstance(denom, str):
         raise ValueError(f"Denom must be a string, got {type(denom)}: {denom}")
 
     if denom.startswith("ibc/"):
         denom = get_denom_trace(denom)
 
-    base_amount = float(amount)
-    base_denom = denom
+    base_amount: float = float(amount)
+    base_denom: str = denom
 
     if base_denom in DENOM_CONVERSIONS:
         conversion = DENOM_CONVERSIONS[base_denom]
@@ -166,6 +207,19 @@ def convert_to_base_denom(amount: str, denom: str) -> Tuple[str, str]:
 COINGECKO_CACHE = CoinGeckoCache()
 
 def get_usd_value(amount: str, denom: str) -> str:
+    """
+    Get USD value for token amount
+    
+    Args:
+        amount: Token amount as string
+        denom: Token denomination
+        
+    Returns:
+        str: USD value as string
+        
+    Raises:
+        ValueError: If inputs are not strings
+    """
     if type(amount) not in [str, float, int] or type(denom) not in [str, float, int]:
         raise ValueError(f"Amount and denom must be strings, got {type(amount)} and {type(denom)}")
     
@@ -187,10 +241,17 @@ def get_usd_value(amount: str, denom: str) -> str:
 
     return str(result)
 
-def process_token(amount: float, denom: str) -> dict:
+def process_token(amount: float, denom: str) -> ProcessedToken:
     """
     Process a single token and return its details
-    Returns: dict with amount, denom, orig_denom, usd_value
+    
+    Args:
+        amount: Token amount as float
+        denom: Token denomination
+        
+    Returns:
+        ProcessedToken: Processed token details
+        
     Raises: 
         ValueError: For invalid tokens, amounts too small/large, or processing errors
     """
@@ -221,27 +282,34 @@ def process_token(amount: float, denom: str) -> dict:
         "value_usd": f"${usd_value:.2f}"
     }
 
-def process_token_array(tokens: list) -> dict:
+def process_token_array(tokens: List[TokenAmount]) -> ProcessedTokenArray:
     """
     Process an array of tokens and return processed items with total
-    Returns: dict with items array and usd_sum
+    
+    Args:
+        tokens: List of token amounts to process
+        
+    Returns:
+        ProcessedTokenArray: Processed tokens with total USD value
     """
-    processed_items = []
-    usd_sum = 0.0
+    processed_items: List[ProcessedToken] = []
+    usd_sum: float = 0.0
     
     for token in tokens:
         try:
-            if type(token) != dict:
-                raise ValueError(f"Token is not a dictionary: {token}")
+            if not isinstance(token, dict):
+                print(f"[Token Error] Token is not a dictionary: {token}")
+                continue
             
             if "amount" not in token or "denom" not in token:
-                raise ValueError(f"Token is not valid: {token}")
+                print(f"[Token Error] Token missing required fields: {token}")
+                continue
             
             amount = float(token.get("amount", 0))
             denom = token.get("denom", "")
             
             if not denom:
-                print(f"Skipping token with no denom: {token}")
+                print(f"[Token Error] Token has no denom: {token}")
                 continue
                 
             try:
@@ -249,14 +317,16 @@ def process_token_array(tokens: list) -> dict:
                 processed_items.append(processed)
                 usd_sum += float(processed["value_usd"].replace("$", ""))
             except ValueError as e:
-                print(f"Skipping invalid token: {e}")
+                print(f"[Token Warning] Skipping invalid token: {e}")
                 continue
                 
         except Exception as e:
-            print(f"Error processing token in array: {token}: {e}")
+            print(f"[Token Error] Failed to process token: {token}")
+            print(f"[Token Error] Error details: {str(e)}")
             continue
-            
+    
+    # Always return with both fields, even if empty
     return {
-        "items": processed_items,
-        "usd_sum": usd_sum
+        "tokens": processed_items,  # Changed from "items" to "tokens" to match expected structure
+        "total_usd": usd_sum
     }

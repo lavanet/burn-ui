@@ -59,3 +59,38 @@ export function FormatDollarValue(value: number | string): string {
         return typeof value === 'string' ? value : String(value);
     }
 }
+
+export function FormatDate(dateString: string): string {
+    try {
+        // Handle format like "2025-01-03_11-10-05"
+        if (dateString.includes('_')) {
+            // Replace underscore with T and convert time separators
+            const [datePart, timePart] = dateString.split('_')
+            const formattedTime = timePart.replace(/-/g, ':')
+            dateString = `${datePart}T${formattedTime}`
+        }
+
+        // Create a Date object in UTC to ensure consistent behavior
+        const date = new Date(dateString)
+
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            console.error(`[FormatDate] Invalid date: ${dateString}`)
+            return dateString
+        }
+
+        // Use Intl.DateTimeFormat for consistent formatting
+        return new Intl.DateTimeFormat('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+        }).format(date)
+    } catch (error) {
+        console.error(`[FormatDate] Error formatting date: ${dateString}`, error)
+        return dateString
+    }
+} 

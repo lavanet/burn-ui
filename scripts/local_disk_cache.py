@@ -5,7 +5,7 @@ import pickle
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 CACHE_DIR = os.path.join(script_dir, "cache")
-CACHE_DURATION = timedelta(hours=1)  # Cache data for 24 hours
+CACHE_DURATION = timedelta(hours=24) 
 
 # Create cache directory if it doesn't exist
 os.makedirs(CACHE_DIR, exist_ok=True)
