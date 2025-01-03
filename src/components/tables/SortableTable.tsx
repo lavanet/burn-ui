@@ -227,5 +227,6 @@ export {
     TableRow,
     TableCell,
     TableCaption,
-    SortDirection
 }
+
+export type { SortDirection }
