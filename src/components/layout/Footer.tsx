@@ -10,9 +10,9 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col md:flex-row items-center justify-between h-auto md:h-16 border-t bg-background px-4 py-2 md:py-0 md:px-6 gap-6 md:gap-0">
-      <div className="grid grid-cols-3 md:flex items-center gap-4">
-        <div className="flex flex-col items-center gap-1 group relative">
+    <footer className="flex flex-col md:flex-row items-center justify-between h-auto md:h-16 border-t bg-background px-4 py-4 md:py-0 md:px-6">
+      <div className="grid grid-cols-3 md:flex items-center gap-6 md:gap-4 py-4 md:py-0">
+        <div className="flex flex-col items-center gap-2 md:gap-1 group relative">
           <a
             href="https://twitter.com/lavanetxyz"
             target="_blank"
@@ -28,7 +28,7 @@ export default function Footer() {
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-1 group relative">
+        <div className="flex flex-col items-center gap-2 md:gap-1 group relative">
           <a
             href="https://discord.gg/lavanetxyz"
             target="_blank"
@@ -44,7 +44,7 @@ export default function Footer() {
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-1 group relative">
+        <div className="flex flex-col items-center gap-2 md:gap-1 group relative">
           <a
             href="https://t.me/officiallavanetwork"
             target="_blank"
@@ -60,7 +60,7 @@ export default function Footer() {
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-1 group relative">
+        <div className="flex flex-col items-center gap-2 md:gap-1 group relative">
           <a
             href="https://lavanet.xyz"
             target="_blank"
@@ -76,7 +76,7 @@ export default function Footer() {
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-1 group relative">
+        <div className="flex flex-col items-center gap-2 md:gap-1 group relative">
           <a
             href="https://lavanet.xyz/whitepaper"
             target="_blank"
@@ -92,7 +92,7 @@ export default function Footer() {
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-1 group relative">
+        <div className="flex flex-col items-center gap-2 md:gap-1 group relative">
           <a
             href="https://docs.lavanet.xyz/token"
             target="_blank"
@@ -109,7 +109,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <span className="text-sm text-muted-foreground pb-2 md:pb-0">
+      <span className="text-sm text-muted-foreground pb-4 md:pb-0 pt-2 md:pt-0">
         Made with ❤️ by <a
           href='https://x.com/magmadevs'
           target='_blank'
