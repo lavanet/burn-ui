@@ -62,3 +62,7 @@ all_rewards_latest.json
 scripts/__pycache__/*
 scripts/__pycache__/**/*
 scripts/__pycache__/consts.cpython-311.pyc
+blocks_latest.json
+blocks_*.json
+
+scripts/__pycache__/consts.cpython-311.pyc

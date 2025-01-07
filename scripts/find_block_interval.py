@@ -1,139 +1,181 @@
-import json
-from datetime import datetime, timedelta
-from typing import Dict, Optional
+import sys
+from datetime import datetime, timedelta, timezone
+from typing import Dict, Optional, Tuple, List
 from run_lavad_command import run_lavad_command
+from multiprocessing import Pool, cpu_count
+from tqdm import tqdm
+from utils import save_json
 
 BLOCKS_PER_DAY = 6000
 BLOCKS_PER_HOUR = BLOCKS_PER_DAY // 24
 block_time_cache = {}
 
 def get_latest_height() -> int:
-    return int(run_lavad_command("lavad q block", no_json_output_flag=True)["block"]["header"]["height"])
+    try:
+        return int(run_lavad_command("lavad q block", no_json_output_flag=True)["block"]["header"]["height"])
+    except Exception as e:
+        print(f"Fatal error getting latest height: {e}")
+        sys.exit(1)
 
-def get_block_at_time(height: int) -> datetime:
+def get_block_time(height: int, latest_height: int) -> Optional[datetime]:
     """Get block timestamp for a given height with caching"""
-    # Check cache first
     if height in block_time_cache:
         return block_time_cache[height]
         
     try:            
-        response = run_lavad_command(f"lavad q block {height}")
+        if height > latest_height:
+            return None
+            
+        response = run_lavad_command(f"lavad q block {height}", no_json_output_flag=True)
         if not response:
-            raise Exception("Failed to get block data")
+            return None
         
         time_str = response["block"]["header"]["time"]
         block_time = datetime.fromisoformat(time_str.replace("Z", "+00:00"))
-        
-        # Cache the result
         block_time_cache[height] = block_time
         return block_time
         
     except Exception as e:
         print(f"Error getting block time for height {height}: {e}")
-        raise e
+        return None
 
-def find_midnight_block(target_date: datetime, initial_height: int) -> Optional[Dict]:
-    """Find block closest to midnight using binary search with expanding ranges"""
+def find_midnight_block(search_params: Tuple[int, datetime, int]) -> Optional[Dict]:
+    """Find block closest to midnight using binary search with refinements"""
+    base_height, target_date, latest_height = search_params
     closest_block = None
     smallest_diff = float('inf')
     
-    # Try increasingly larger ranges around the initial height
-    ranges = [100, 500, 2000, 5000]  # Block ranges to search
+    target_midnight = target_date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
     
-    for block_range in ranges:
-        left = initial_height - block_range
-        right = initial_height + block_range
+    # First phase: Quick binary search to get approximate area
+    left = max(1, base_height - 100000)
+    right = min(latest_height, base_height + 100000)
+    
+    while left <= right:
+        mid = (left + right) // 2
+        current_time = get_block_time(mid, latest_height)
+        if not current_time:
+            continue
+            
+        time_diff = (current_time - target_midnight).total_seconds()
+        abs_diff = abs(time_diff)
         
-        while left <= right:
-            mid = (left + right) // 2
-            block_time = get_block_at_time(mid)
+        if abs_diff < smallest_diff:
+            smallest_diff = abs_diff
+            closest_block = {
+                "height": mid,
+                "time": current_time.isoformat(),
+                "seconds_off": abs_diff,
+                "date": target_date.date().isoformat()
+            }
+            base_height = mid
             
-            if not block_time:
-                continue
+            if abs_diff < 2:
+                return closest_block
+        
+        if time_diff > 0:
+            right = mid - 1
+        else:
+            left = mid + 1
+    
+    # Second phase: Explore around best block found with big jumps
+    if closest_block:
+        jumps = [10000, 5000, 1000, 500, 100, 50, 10, 1]
+        base = closest_block["height"]
+        
+        for jump in jumps:
+            for mult in [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]:
+                height = base + (jump * mult)
+                if height < 1 or height > latest_height:
+                    continue
+                    
+                current_time = get_block_time(height, latest_height)
+                if not current_time:
+                    continue
+                    
+                time_diff = (current_time - target_midnight).total_seconds()
+                abs_diff = abs(time_diff)
                 
-            time_diff = abs((block_time - target_date).total_seconds())
-            
-            if time_diff < smallest_diff:
-                smallest_diff = time_diff
-                closest_block = {
-                    "height": mid,
-                    "time": block_time.isoformat(),
-                    "seconds_off": time_diff
-                }
-                
-                if time_diff < 30:  # Within 30 seconds
-                    # Fine-tune around this block
-                    for h in range(mid - 10, mid + 10):
-                        bt = get_block_at_time(h)
-                        if bt:
-                            tdiff = abs((bt - target_date).total_seconds())
-                            if tdiff < smallest_diff:
-                                smallest_diff = tdiff
-                                closest_block = {
-                                    "height": h,
-                                    "time": bt.isoformat(),
-                                    "seconds_off": tdiff
-                                }
-                    return closest_block
-            
-            if block_time > target_date:
-                right = mid - 1
-            else:
-                left = mid + 1
-                
-        if smallest_diff < 300:  # Within 5 minutes
-            break
-            
+                if abs_diff < smallest_diff:
+                    smallest_diff = abs_diff
+                    closest_block = {
+                        "height": height,
+                        "time": current_time.isoformat(),
+                        "seconds_off": abs_diff,
+                        "date": target_date.date().isoformat()
+                    }
+                    base = height
+                    
+                    if abs_diff < 2:
+                        return closest_block
+    
     return closest_block
 
 def main():
-    # Get current time
-    now = datetime.now()
-    
-    # Create list of dates (17th and 18th of each month for past year)
-    dates = []
-    current_date = now
-    for _ in range(12):  # Past 12 months
-        month_17th = current_date.replace(day=17, hour=0, minute=0, second=0, microsecond=0)
-        month_18th = current_date.replace(day=18, hour=0, minute=0, second=0, microsecond=0)
+    try:
+        latest_height = get_latest_height()
+        print(f"Latest block height: {latest_height}")
         
-        if month_17th < now:
-            dates.append(month_17th)
-        if month_18th < now:
-            dates.append(month_18th)
+        # Get current time in UTC
+        now = datetime.now(timezone.utc)
+        
+        # Create search parameters with better initial estimates
+        search_params = []
+        current_date = now
+        
+        # Look back 24 months with debug output
+        for month in range(24):
+            for day in [17, 18]:
+                target_date = current_date.replace(day=day, hour=0, minute=0, second=0, microsecond=0)
+                if target_date < now:
+                    # More precise block estimation
+                    days_diff = (now - target_date).total_seconds() / 86400
+                    estimated_blocks = int(days_diff * BLOCKS_PER_DAY)
+                    estimated_height = latest_height - estimated_blocks
+                    
+                    # Debug output
+                    print(f"Month {month}: {target_date.date()} -> estimated height: {estimated_height}")
+                    
+                    if estimated_height > 0:
+                        search_params.append((estimated_height, target_date, latest_height))
+                    else:
+                        print(f"Skipping {target_date.date()} - estimated height {estimated_height} too low")
             
-        current_date = (current_date.replace(day=1) - timedelta(days=1))
+            # Move to previous month more precisely
+            if current_date.month == 1:
+                current_date = current_date.replace(year=current_date.year - 1, month=12, day=1)
+            else:
+                current_date = current_date.replace(month=current_date.month - 1, day=1)
 
-    # Process dates
-    blocks = []
-    for date in sorted(dates):
-        print(f"\nProcessing {date.strftime('%Y-%m-%d')}...")
+        print(f"\nGenerated {len(search_params)} search parameters")
         
-        # First try block-at-time query
-        initial_height = get_block_at_time(date)
-        if not initial_height:
-            # Fallback to estimation
-            days_ago = (now - date).days
-            initial_height = get_latest_height() - (days_ago * BLOCKS_PER_DAY)
+        # Run searches in parallel with timeout
+        num_processes = min(cpu_count(), 8)
+        print(f"\nSearching with {num_processes} parallel processes...")
         
-        # Find precise midnight block
-        result = find_midnight_block(date, initial_height)
-        if result:
-            blocks.append({
-                "date": date.strftime("%Y-%m-%d"),
-                "block": result["height"],
-                "block_time": result["time"],
-                "accuracy_seconds": result["seconds_off"]
-            })
-            print(f"Found block {result['height']} ({result['seconds_off']:.1f}s from target)")
+        with Pool(num_processes) as pool:
+            results = list(tqdm(
+                pool.imap_unordered(find_midnight_block, search_params),
+                total=len(search_params),
+                desc="Finding midnight blocks"
+            ))
+        
+        # Filter and sort results
+        results = [r for r in results if r is not None]
+        results.sort(key=lambda x: x["date"], reverse=True)
+        
+        # Save results
+        save_json({
+            "generated_at": now.isoformat(),
+            "latest_height": latest_height,
+            "blocks": results
+        }, "block_heights.json")
+        
+        print(f"\nSaved {len(results)} block heights to block_heights.json")
 
-    # Save results
-    with open('block_heights.json', 'w') as f:
-        json.dump({
-            "generated_at": datetime.now().isoformat(),
-            "blocks": blocks
-        }, f, indent=2)
-        print(f"\nSaved {len(blocks)} block heights to block_heights.json")
+    except Exception as e:
+        print(f"Fatal error in main: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main() 
