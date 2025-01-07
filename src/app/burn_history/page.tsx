@@ -164,9 +164,9 @@ export default function BurnHistory() {
                     color: '#ffffff'
                 },
                 ticks: {
-                    callback: (value: number) => {
-                        if (typeof value === 'number' && value >= 0 && value < data.length) {
-                            return formatDate(data[value].date)
+                    callback: function (this: any, tickValue: string | number, index: number) {
+                        if (index >= 0 && index < data.length) {
+                            return formatDate(data[index].date)
                         }
                         return ''
                     },
