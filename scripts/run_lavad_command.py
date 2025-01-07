@@ -9,7 +9,7 @@ def get_command_hash(command: str) -> str:
     """Create a unique hash for the command to use as cache key"""
     return hashlib.md5(command.encode()).hexdigest()
 
-def run_lavad_command(command: str) -> Optional[Dict[str, Any]]:
+def run_lavad_command(command: str, no_json_output_flag: bool = False) -> Optional[Dict[str, Any]]:
     """
     Run a lavad command with caching
     
@@ -26,6 +26,8 @@ def run_lavad_command(command: str) -> Optional[Dict[str, Any]]:
             
         # Add the node argument
         full_command = f"lavad {command} --node {RPC_URL} --output json"
+        if no_json_output_flag:
+            full_command = f"lavad {command} --node {RPC_URL}"
         
         # Check cache first
         cache_key = get_command_hash(full_command)

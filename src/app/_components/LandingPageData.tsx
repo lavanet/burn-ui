@@ -29,7 +29,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
     <>
       <CardHeader className="flex flex-col items-center justify-center border-b py-3">
         <CardTitle className="text-3xl font-bold text-center mt-0 mb-3">
-          LAVA Burn & Revenue Statistic
+          LAVA Burn & Revenue Statistics
         </CardTitle>
       </CardHeader>
 
