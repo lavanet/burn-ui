@@ -164,7 +164,12 @@ export default function BurnHistory() {
                     color: '#ffffff'
                 },
                 ticks: {
-                    callback: (value) => formatDate(data[value].date),
+                    callback: (value: number) => {
+                        if (typeof value === 'number' && value >= 0 && value < data.length) {
+                            return formatDate(data[value].date)
+                        }
+                        return ''
+                    },
                     maxRotation: 45,
                     minRotation: 45,
                     font: {
@@ -227,7 +232,7 @@ export default function BurnHistory() {
     ]
 
     return (
-        <div className="p-8 w-full min-h-screen bg-black">
+        <div className="p-8 w-full min-h-screen">
             <div className="max-w-[1600px] mx-auto">
                 <h1 className="text-4xl font-bold mb-10 text-center text-white">LAVA Token Burn History</h1>
                 <div className="mb-12">
