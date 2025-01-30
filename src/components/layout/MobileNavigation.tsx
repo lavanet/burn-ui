@@ -32,6 +32,9 @@ export default function MobileNavigation() {
           <Link href="/" className="hover:text-foreground">
             Burn Stats
           </Link>
+          <Link href="/burn-rate" className="hover:text-foreground">
+            Burn Rate
+          </Link>
           <Link href="https://stats.lavanet.xyz" className="hover:text-foreground">
             Network Stats
           </Link>

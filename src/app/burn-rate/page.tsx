@@ -34,7 +34,7 @@ ChartJS.register(
     Legend
 )
 
-export default function BurnHistory() {
+export default function BurnRatePage() {
     const formatLava = (amount: number) => {
         return amount.toLocaleString(undefined, {
             minimumFractionDigits: 3,
@@ -67,13 +67,15 @@ export default function BurnHistory() {
         return `${month} ${day}, ${year}`
     }
 
-    // Convert ulava to LAVA (divide by 1_000_000)
-    const data = burnHistory.blocks.map(block => ({
-        date: block.date,
-        amount: block.ulava_amount / 1_000_000,
-        height: block.height,
-        diff: block.ulava_diff ? block.ulava_diff / 1_000_000 : 0
-    })).reverse() // Reverse to show oldest first
+    const data = burnHistory.blocks
+        .slice() // Create a copy before reversing
+        .reverse() // Show oldest first
+        .map(block => ({
+            date: block.day,
+            amount: block.supply,
+            height: block.block,
+            diff: block.supply_diff || 0
+        }))
 
     const chartData = {
         labels: data.map(item => formatDate(item.date)),
@@ -124,7 +126,7 @@ export default function BurnHistory() {
                         return [
                             `Supply: ${formatLava(dataPoint.amount)} LAVA`,
                             `Block: ${dataPoint.height}`,
-                            dataPoint.diff ? `Burned: ${formatLava(dataPoint.diff)} LAVA` : ''
+                            dataPoint.diff > 0 ? `Burned: ${formatLava(dataPoint.diff)} LAVA` : ''
                         ].filter(Boolean)
                     }
                 }
@@ -132,7 +134,8 @@ export default function BurnHistory() {
         },
         scales: {
             y: {
-                min: 980_000_000,
+                min: 983_000_000, // Adjusted based on current data
+                max: 999_000_000, // Added max to better show the range
                 title: {
                     display: true,
                     text: 'LAVA Amount (Millions)',
