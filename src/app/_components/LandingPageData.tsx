@@ -15,6 +15,7 @@ import { TotalSupplyPieChart } from "./TotalSupplyPieChart";
 import { CurrentTotalSupplyDataBox } from "./CurrentTotalSupplyDataBox";
 import { CurrentCirculatingSupplyDataBox } from "./CurrentCirculatingSupplyDataBox";
 import { FAQ, FAQItem } from "@burn/components/faq";
+import DistributedRewardsDataBox from "./DistributedRewardsDataBox"
 
 export default function LandingPageData() {
   const faqList: FAQItem[] = [
@@ -59,13 +60,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
         {/* Rest of the boxes in grid */}
         <Card style={{ margin: '15px' }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 gap-y-0">
-            <DataBox
-              title="Already distributed"
-              value="$420K USD"
-              tooltip="Distributed rewards to LAVA stakers in USD on mainnet and testnet"
-              icon={<CircleDollarSign className="h-4 w-4" />}
-              subtext="Updated daily"
-            />
+            <DistributedRewardsDataBox />
             <DataBox
               title="LAVA Burned"
               value="14,911,406.3"

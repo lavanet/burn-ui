@@ -16,16 +16,14 @@ interface DataBoxProps {
 }
 
 export function DataBox({ title, value, tooltip, largeValueText = false, className = "", subtext, icon, iconPosition = 'right' }: DataBoxProps) {
-  return (
+  const card = (
     <div className={`p-4 rounded-lg ${className}`}>
       <Card>
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
           <CardTitle className={`${largeValueText ? 'text-m' : 'text-sm'} font-medium`}>
-            <ModernTooltip title={tooltip}>
-              <div className="flex items-center gap-2">
-                {title}
-              </div>
-            </ModernTooltip>
+            <div className="flex items-center gap-2">
+              {title}
+            </div>
           </CardTitle>
           {icon && (
             <span className="text-muted-foreground">
@@ -45,5 +43,17 @@ export function DataBox({ title, value, tooltip, largeValueText = false, classNa
         </CardContent>
       </Card>
     </div>
-  );
+  )
+
+  if (tooltip) {
+    return (
+      <ModernTooltip title={tooltip}>
+        <div className="cursor-help">
+          {card}
+        </div>
+      </ModernTooltip>
+    )
+  }
+
+  return card
 }
