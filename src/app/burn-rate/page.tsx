@@ -79,13 +79,15 @@ export default function BurnRatePage() {
         const dateB = parseYearMonth(b)
 
         if (dateA.year === dateB.year) {
-            return dateA.month - dateB.month  // Changed: ascending month order within same year
+            return dateA.month - dateB.month  // Ascending month order within same year
         }
         return dateB.year - dateA.year  // Keep descending year order
     }
 
-    const data = burnHistory.blocks
+    // Get the data in chronological order for the chart
+    const chartData = burnHistory.blocks
         .slice()
+        .reverse()  // Keep reverse for chart visualization
         .map(block => ({
             date: block.day,
             amount: block.supply,
@@ -93,25 +95,29 @@ export default function BurnRatePage() {
             diff: block.supply_diff || 0,
             cumulativeBurn: 0
         }))
-        .sort((a, b) => sortByYearAndMonth(a.date, b.date))
 
+    // Calculate cumulative burn
     let totalBurn = 0
-    data.forEach(item => {
+    chartData.forEach(item => {
         if (item.diff > 0) {
             totalBurn += item.diff
         }
         item.cumulativeBurn = totalBurn
     })
 
-    const initialSupply = Math.max(...data.map(item => item.amount))
+    // Create a separate sorted array for the table
+    const tableData = [...chartData].sort((a, b) => sortByYearAndMonth(a.date, b.date))
 
-    const chartData = {
-        labels: data.map(item => formatDate(item.date)),
+    const initialSupply = Math.max(...chartData.map(item => item.amount))
+
+    // Use chartData for the chart
+    const chartConfig = {
+        labels: chartData.map(item => formatDate(item.date)),
         datasets: [
             {
                 type: 'bar' as const,
                 label: 'Remaining Supply',
-                data: data.map(item => item.amount),
+                data: chartData.map(item => item.amount),
                 backgroundColor: 'rgba(255, 107, 107, 0.8)',
                 borderColor: '#FF6B6B',
                 borderWidth: 1,
@@ -120,7 +126,7 @@ export default function BurnRatePage() {
             {
                 type: 'bar' as const,
                 label: 'Burned Amount',
-                data: data.map(item => item.cumulativeBurn),
+                data: chartData.map(item => item.cumulativeBurn),
                 backgroundColor: 'rgba(76, 175, 80, 0.8)',
                 borderColor: '#4CAF50',
                 borderWidth: 1,
@@ -157,9 +163,9 @@ export default function BurnRatePage() {
                 },
                 padding: 15,
                 callbacks: {
-                    title: (context) => formatFullDate(data[context[0].dataIndex].date),
+                    title: (context) => formatFullDate(chartData[context[0].dataIndex].date),
                     label: (context: any) => {
-                        const dataPoint = data[context.dataIndex]
+                        const dataPoint = chartData[context.dataIndex]
                         const percentage = ((dataPoint.cumulativeBurn / initialSupply) * 100).toFixed(4)
 
                         if (context.dataset.label === 'Burned Amount') {
@@ -215,8 +221,8 @@ export default function BurnRatePage() {
                 },
                 ticks: {
                     callback: function (this: any, tickValue: string | number, index: number) {
-                        if (index >= 0 && index < data.length) {
-                            return formatDate(data[index].date)
+                        if (index >= 0 && index < chartData.length) {
+                            return formatDate(chartData[index].date)
                         }
                         return ''
                     },
@@ -290,7 +296,7 @@ export default function BurnRatePage() {
                 <h1 className="text-4xl font-bold mb-10 text-center text-white">LAVA Token Burn History</h1>
                 <div className="mb-12">
                     <div className="h-[800px]">
-                        <Bar data={chartData} options={options} />
+                        <Bar data={chartConfig} options={options} />
                     </div>
                 </div>
 
@@ -307,7 +313,7 @@ export default function BurnRatePage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {data.map((row, i) => (
+                            {tableData.map((row, i) => (
                                 <TableRow key={i}>
                                     {columns.map((column) => (
                                         <TableCell key={column.accessorKey}>
