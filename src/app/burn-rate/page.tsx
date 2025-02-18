@@ -1,6 +1,6 @@
 'use client'
 
-import { Line } from 'react-chartjs-2'
+import { Bar } from 'react-chartjs-2'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -277,7 +277,7 @@ export default function BurnRatePage() {
                 <h1 className="text-4xl font-bold mb-10 text-center text-white">LAVA Token Burn History</h1>
                 <div className="mb-12">
                     <div className="h-[800px]">
-                        <Line data={chartData} options={options} type='bar' />
+                        <Bar data={chartData} options={options} />
                     </div>
                 </div>
 
