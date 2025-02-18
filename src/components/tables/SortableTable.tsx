@@ -34,16 +34,22 @@ const Table = React.forwardRef<
             const aText = a.cells[columnIndex]?.textContent?.trim() || ''
             const bText = b.cells[columnIndex]?.textContent?.trim() || ''
 
-            // Try to parse as numbers (removing $ and commas)
+            // Special case for date column (first column)
+            if (columnIndex === 0) {
+                // Get the block number from the second column
+                const aBlock = parseFloat(a.cells[1]?.textContent?.replace(/,/g, '') || '0')
+                const bBlock = parseFloat(b.cells[1]?.textContent?.replace(/,/g, '') || '0')
+                return direction === 'asc' ? aBlock - bBlock : bBlock - aBlock
+            }
+
+            // For other columns, keep the existing logic
             const aNum = parseFloat(aText.replace(/[$,]/g, ''))
             const bNum = parseFloat(bText.replace(/[$,]/g, ''))
 
             if (!isNaN(aNum) && !isNaN(bNum)) {
-                // If both are valid numbers, do numeric comparison
                 return direction === 'asc' ? aNum - bNum : bNum - aNum
             }
 
-            // Fall back to string comparison
             return direction === 'asc'
                 ? aText.localeCompare(bText)
                 : bText.localeCompare(aText)
