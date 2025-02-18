@@ -69,9 +69,23 @@ export default function BurnRatePage() {
         return `${month} ${day}, ${year}`
     }
 
+    const parseYearMonth = (dateStr: string) => {
+        const [year, month] = dateStr.split('-').map(Number)
+        return { year, month }
+    }
+
+    const sortByYearAndMonth = (a: string, b: string) => {
+        const dateA = parseYearMonth(a)
+        const dateB = parseYearMonth(b)
+
+        if (dateA.year === dateB.year) {
+            return dateA.month - dateB.month  // Changed: ascending month order within same year
+        }
+        return dateB.year - dateA.year  // Keep descending year order
+    }
+
     const data = burnHistory.blocks
         .slice()
-        .reverse()
         .map(block => ({
             date: block.day,
             amount: block.supply,
@@ -79,6 +93,7 @@ export default function BurnRatePage() {
             diff: block.supply_diff || 0,
             cumulativeBurn: 0
         }))
+        .sort((a, b) => sortByYearAndMonth(a.date, b.date))
 
     let totalBurn = 0
     data.forEach(item => {
@@ -229,10 +244,8 @@ export default function BurnRatePage() {
             ),
             accessorKey: "date",
             cell: (props: any) => formatDate(props.getValue()),
-            sortingFn: (a: any, b: any) => {
-                const dateA = new Date(a.date).getTime()
-                const dateB = new Date(b.date).getTime()
-                return dateA - dateB
+            sortingFn: (rowA: any, rowB: any) => {
+                return sortByYearAndMonth(rowA.original.date, rowB.original.date)
             }
         },
         {
