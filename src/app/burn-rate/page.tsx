@@ -7,6 +7,7 @@ import {
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -29,6 +30,7 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend
@@ -86,47 +88,33 @@ export default function BurnRatePage() {
         item.cumulativeBurn = totalBurn
     })
 
+    const initialSupply = Math.max(...data.map(item => item.amount))
+
     const chartData = {
         labels: data.map(item => formatDate(item.date)),
         datasets: [
             {
-                label: 'Total LAVA Supply',
+                type: 'bar' as const,
+                label: 'Remaining Supply',
                 data: data.map(item => item.amount),
+                backgroundColor: 'rgba(255, 107, 107, 0.8)',
                 borderColor: '#FF6B6B',
-                backgroundColor: 'rgba(255, 107, 107, 0.15)',
-                borderWidth: 3,
-                pointRadius: 8,
-                pointHoverRadius: 10,
-                pointBackgroundColor: '#FF6B6B',
-                pointBorderColor: '#1a1a1a',
-                pointHoverBackgroundColor: '#1a1a1a',
-                pointHoverBorderColor: '#FF6B6B',
-                tension: 0.4,
-                fill: true,
-                showLine: true,
-                yAxisID: 'y'
+                borderWidth: 1,
+                stack: 'stack0',
             },
             {
-                label: 'Cumulative Burn',
+                type: 'bar' as const,
+                label: 'Burned Amount',
                 data: data.map(item => item.cumulativeBurn),
+                backgroundColor: 'rgba(76, 175, 80, 0.8)',
                 borderColor: '#4CAF50',
-                backgroundColor: 'rgba(76, 175, 80, 0.15)',
-                borderWidth: 3,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointBackgroundColor: '#4CAF50',
-                pointBorderColor: '#1a1a1a',
-                pointHoverBackgroundColor: '#1a1a1a',
-                pointHoverBorderColor: '#4CAF50',
-                tension: 0.4,
-                fill: true,
-                showLine: true,
-                yAxisID: 'y1'
+                borderWidth: 1,
+                stack: 'stack0',
             }
         ]
     }
 
-    const options: ChartOptions<'line'> = {
+    const options: ChartOptions<'bar'> = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -157,28 +145,31 @@ export default function BurnRatePage() {
                     title: (context) => formatFullDate(data[context[0].dataIndex].date),
                     label: (context: any) => {
                         const dataPoint = data[context.dataIndex]
-                        if (context.dataset.label === 'Cumulative Burn') {
-                            return `Total Burned: ${formatLava(dataPoint.cumulativeBurn)} LAVA`
+                        const percentage = ((dataPoint.cumulativeBurn / initialSupply) * 100).toFixed(4)
+
+                        if (context.dataset.label === 'Burned Amount') {
+                            return [
+                                `Total Burned: ${formatLava(dataPoint.cumulativeBurn)} LAVA`,
+                                `Burn Rate: ${percentage}%`,
+                                dataPoint.diff > 0 ? `Daily Burn: ${formatLava(dataPoint.diff)} LAVA` : ''
+                            ].filter(Boolean)
                         }
                         return [
-                            `Supply: ${formatLava(dataPoint.amount)} LAVA`,
-                            `Block: ${dataPoint.height}`,
-                            dataPoint.diff > 0 ? `Burned: ${formatLava(dataPoint.diff)} LAVA` : ''
-                        ].filter(Boolean)
+                            `Remaining: ${formatLava(dataPoint.amount)} LAVA`,
+                            `Block: ${dataPoint.height}`
+                        ]
                     }
                 }
             }
         },
         scales: {
             y: {
-                type: 'linear',
-                display: true,
-                position: 'left',
+                stacked: true,
                 min: 983_000_000,
-                max: 999_000_000,
+                max: initialSupply,
                 title: {
                     display: true,
-                    text: 'Total LAVA Supply',
+                    text: 'LAVA Supply',
                     font: {
                         size: 16,
                         weight: 'bold'
@@ -196,31 +187,8 @@ export default function BurnRatePage() {
                     color: 'rgba(255, 255, 255, 0.1)'
                 }
             },
-            y1: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                title: {
-                    display: true,
-                    text: 'Cumulative Burn (LAVA)',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    color: '#ffffff'
-                },
-                ticks: {
-                    callback: (value) => formatLavaMillions(value as number),
-                    font: {
-                        size: 14
-                    },
-                    color: '#ffffff'
-                },
-                grid: {
-                    drawOnChartArea: false
-                }
-            },
             x: {
+                stacked: true,
                 title: {
                     display: true,
                     text: 'Date',
@@ -309,7 +277,7 @@ export default function BurnRatePage() {
                 <h1 className="text-4xl font-bold mb-10 text-center text-white">LAVA Token Burn History</h1>
                 <div className="mb-12">
                     <div className="h-[800px]">
-                        <Line data={chartData} options={options} />
+                        <Line data={chartData} options={options} type='bar' />
                     </div>
                 </div>
 
