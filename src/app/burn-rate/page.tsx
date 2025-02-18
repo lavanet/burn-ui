@@ -68,20 +68,29 @@ export default function BurnRatePage() {
     }
 
     const data = burnHistory.blocks
-        .slice() // Create a copy before reversing
-        .reverse() // Show oldest first
+        .slice()
+        .reverse()
         .map(block => ({
             date: block.day,
             amount: block.supply,
             height: block.block,
-            diff: block.supply_diff || 0
+            diff: block.supply_diff || 0,
+            cumulativeBurn: 0
         }))
+
+    let totalBurn = 0
+    data.forEach(item => {
+        if (item.diff > 0) {
+            totalBurn += item.diff
+        }
+        item.cumulativeBurn = totalBurn
+    })
 
     const chartData = {
         labels: data.map(item => formatDate(item.date)),
         datasets: [
             {
-                label: 'LAVA Supply',
+                label: 'Total LAVA Supply',
                 data: data.map(item => item.amount),
                 borderColor: '#FF6B6B',
                 backgroundColor: 'rgba(255, 107, 107, 0.15)',
@@ -94,7 +103,25 @@ export default function BurnRatePage() {
                 pointHoverBorderColor: '#FF6B6B',
                 tension: 0.4,
                 fill: true,
-                showLine: true
+                showLine: true,
+                yAxisID: 'y'
+            },
+            {
+                label: 'Cumulative Burn',
+                data: data.map(item => item.cumulativeBurn),
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.15)',
+                borderWidth: 3,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#4CAF50',
+                pointBorderColor: '#1a1a1a',
+                pointHoverBackgroundColor: '#1a1a1a',
+                pointHoverBorderColor: '#4CAF50',
+                tension: 0.4,
+                fill: true,
+                showLine: true,
+                yAxisID: 'y1'
             }
         ]
     }
@@ -104,7 +131,14 @@ export default function BurnRatePage() {
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: false
+                display: true,
+                position: 'top',
+                labels: {
+                    color: '#ffffff',
+                    font: {
+                        size: 14
+                    }
+                }
             },
             title: {
                 display: false
@@ -123,6 +157,9 @@ export default function BurnRatePage() {
                     title: (context) => formatFullDate(data[context[0].dataIndex].date),
                     label: (context: any) => {
                         const dataPoint = data[context.dataIndex]
+                        if (context.dataset.label === 'Cumulative Burn') {
+                            return `Total Burned: ${formatLava(dataPoint.cumulativeBurn)} LAVA`
+                        }
                         return [
                             `Supply: ${formatLava(dataPoint.amount)} LAVA`,
                             `Block: ${dataPoint.height}`,
@@ -134,11 +171,14 @@ export default function BurnRatePage() {
         },
         scales: {
             y: {
-                min: 983_000_000, // Adjusted based on current data
-                max: 999_000_000, // Added max to better show the range
+                type: 'linear',
+                display: true,
+                position: 'left',
+                min: 983_000_000,
+                max: 999_000_000,
                 title: {
                     display: true,
-                    text: 'LAVA Amount (Millions)',
+                    text: 'Total LAVA Supply',
                     font: {
                         size: 16,
                         weight: 'bold'
@@ -154,6 +194,30 @@ export default function BurnRatePage() {
                 },
                 grid: {
                     color: 'rgba(255, 255, 255, 0.1)'
+                }
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'Cumulative Burn (LAVA)',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    color: '#ffffff'
+                },
+                ticks: {
+                    callback: (value) => formatLavaMillions(value as number),
+                    font: {
+                        size: 14
+                    },
+                    color: '#ffffff'
+                },
+                grid: {
+                    drawOnChartArea: false
                 }
             },
             x: {
@@ -196,7 +260,12 @@ export default function BurnRatePage() {
                 </div>
             ),
             accessorKey: "date",
-            cell: (props: any) => formatDate(props.getValue())
+            cell: (props: any) => formatDate(props.getValue()),
+            sortingFn: (a: any, b: any) => {
+                const dateA = new Date(a.date).getTime()
+                const dateB = new Date(b.date).getTime()
+                return dateA - dateB
+            }
         },
         {
             header: (
