@@ -154,21 +154,20 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                         if (context.dataset.label === 'Burned Amount') {
                             return [
                                 `Total Burned: ${formatLava(dataPoint.cumulativeBurn)} LAVA`,
-                                `             ${formatMicroLava(dataPoint.cumulativeBurn)}`,
                                 `Burn Rate: ${dataPoint.burnRate.toFixed(4)}%`,
-                                dataPoint.diff > 0 ? [
-                                    `Daily Burn: ${formatLava(dataPoint.diff)} LAVA`,
-                                    `           ${formatMicroLava(dataPoint.diff)}`
-                                ].join('\n') : ''
+                                dataPoint.diff > 0 ? `Daily Burn: ${formatLava(dataPoint.diff)} LAVA` : ''
                             ].filter(Boolean)
                         }
 
                         if (context.dataset.label === 'Remaining Supply') {
                             return [
                                 `Remaining: ${formatLava(dataPoint.amount)} LAVA`,
-                                `          ${formatMicroLava(dataPoint.amount)}`,
                                 `Block: ${dataPoint.height.toLocaleString()}`
                             ]
+                        }
+
+                        if (context.dataset.label === 'Burn Rate') {
+                            return `${dataPoint.burnRate.toFixed(4)}%`
                         }
 
                         return []

@@ -29,6 +29,10 @@ export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
         return `${(amount * 1_000_000).toLocaleString()} ulava`
     }
 
+    const formatULAVA = (amount: number) => {
+        return `${(amount * 1_000_000_000_000).toLocaleString()} ULAVA`
+    }
+
     const data = getTableData()
 
     const columns = [
@@ -63,7 +67,7 @@ export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
             cell: (props: any) => (
                 <div>
                     <div>{formatLava(props.getValue())} LAVA</div>
-                    <div className="text-sm text-gray-400">{formatMicroLava(props.getValue())}</div>
+                    {/* <div className="text-xs text-gray-400">{formatMicroLava(props.getValue())}</div> */}
                 </div>
             )
         },
@@ -80,7 +84,7 @@ export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
                     {props.getValue() ? (
                         <div>
                             <div>{formatLava(props.getValue())} LAVA</div>
-                            <div className="text-sm">{formatMicroLava(props.getValue())}</div>
+                            {/* <div className="text-xs">{formatMicroLava(props.getValue())}</div> */}
                         </div>
                     ) : '-'}
                 </span>
