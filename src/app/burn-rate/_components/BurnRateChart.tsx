@@ -1,6 +1,6 @@
 "use client"
 
-import { Bar } from 'react-chartjs-2'
+import { Chart } from 'react-chartjs-2'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -253,7 +253,7 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
 
     return (
         <div className="h-[800px]">
-            <Bar data={chartData} options={options} />
+            <Chart type="bar" data={chartData as any} options={options} />
         </div>
     )
 } 
