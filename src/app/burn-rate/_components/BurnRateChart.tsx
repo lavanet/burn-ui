@@ -12,7 +12,8 @@ import {
     Tooltip,
     Legend,
     ChartOptions,
-    BarController
+    BarController,
+    LineController
 } from 'chart.js'
 import burnHistory from '../data/burn_history.json'
 import { calculateBurnData } from '../data/burnDataCalculator'
@@ -24,6 +25,7 @@ ChartJS.register(
     LineElement,
     BarElement,
     BarController,
+    LineController,
     Title,
     Tooltip,
     Legend
