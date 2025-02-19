@@ -11,7 +11,8 @@ import {
     Title,
     Tooltip,
     Legend,
-    ChartOptions
+    ChartOptions,
+    BarController
 } from 'chart.js'
 import burnHistory from '../data/burn_history.json'
 import { calculateBurnData } from '../data/burnDataCalculator'
@@ -22,6 +23,7 @@ ChartJS.register(
     PointElement,
     LineElement,
     BarElement,
+    BarController,
     Title,
     Tooltip,
     Legend
@@ -253,7 +255,11 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
 
     return (
         <div className="h-[800px]">
-            <Chart type="bar" data={chartData as any} options={options} />
+            <Chart
+                type="bar"
+                data={chartData as any}
+                options={options as any}
+            />
         </div>
     )
 } 
