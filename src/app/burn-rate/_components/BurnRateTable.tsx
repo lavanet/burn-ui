@@ -1,6 +1,6 @@
 "use client"
 
-import { CalendarDays, Blocks, Flame, CandlestickChart } from 'lucide-react'
+import { CalendarDays, Blocks, Flame, CandlestickChart, TrendingUp, Percent } from 'lucide-react'
 import {
     Table,
     TableHeader,
@@ -9,7 +9,7 @@ import {
     TableRow,
     TableCell
 } from "@burn/components/tables/SortableTable"
-import burnHistory from '../data/burn_history.json'
+import { calculateBurnData, getTableData } from '../data/burnDataCalculator'
 
 interface BurnRateTableProps {
     formatDate: (date: string) => string
@@ -21,25 +21,11 @@ export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
         return num.toLocaleString()
     }
 
-    const data = burnHistory.blocks
-        .slice()
-        .map(block => ({
-            date: block.day,
-            amount: block.supply,
-            height: block.block,
-            diff: block.supply_diff || 0,
-            cumulativeBurn: 0,
-            sortKey: `${block.block.toString().padStart(10, '0')}`
-        }))
-        .sort((a, b) => b.height - a.height)
+    const formatPercentage = (num: number) => {
+        return `${num.toFixed(4)}%`
+    }
 
-    let totalBurn = 0
-    data.forEach(item => {
-        if (item.diff > 0) {
-            totalBurn += item.diff
-        }
-        item.cumulativeBurn = totalBurn
-    })
+    const data = getTableData()
 
     const columns = [
         {
@@ -49,8 +35,8 @@ export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
                     <span>Date</span>
                 </div>
             ),
-            accessorKey: "sortKey",
-            cell: (props: any) => formatDate(data.find(item => item.sortKey === props.getValue())?.date || "")
+            accessorKey: "date",
+            cell: (props: any) => formatDate(props.getValue())
         },
         {
             header: (
@@ -83,6 +69,30 @@ export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
             cell: (props: any) => (
                 <span className="text-red-600">
                     {props.getValue() ? `${formatLava(props.getValue())} LAVA` : '-'}
+                </span>
+            )
+        },
+        {
+            header: (
+                <div className="flex items-center gap-2">
+                    <Percent className="h-5 w-5" />
+                    <span>Burn Rate</span>
+                </div>
+            ),
+            accessorKey: "burnRate",
+            cell: (props: any) => formatPercentage(props.getValue())
+        },
+        {
+            header: (
+                <div className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    <span>Rate Change</span>
+                </div>
+            ),
+            accessorKey: "burnRateChange",
+            cell: (props: any) => (
+                <span className={props.getValue() > 0 ? "text-green-500" : "text-red-500"}>
+                    {props.getValue() !== 0 ? formatPercentage(props.getValue()) : '-'}
                 </span>
             )
         }

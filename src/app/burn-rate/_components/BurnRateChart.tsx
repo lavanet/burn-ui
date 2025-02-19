@@ -14,6 +14,7 @@ import {
     ChartOptions
 } from 'chart.js'
 import burnHistory from '../data/burn_history.json'
+import { calculateBurnData } from '../data/burnDataCalculator'
 
 ChartJS.register(
     CategoryScale,
@@ -34,36 +35,16 @@ interface BurnRateChartProps {
 }
 
 export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLavaMillions }: BurnRateChartProps) {
-    // Get the data in chronological order for the chart
-    const chartData = burnHistory.blocks
-        .slice()
-        .reverse()  // Keep reverse for chart visualization
-        .map(block => ({
-            date: block.day,
-            amount: block.supply,
-            height: block.block,
-            diff: block.supply_diff || 0,
-            cumulativeBurn: 0
-        }))
+    const data = calculateBurnData()
+    const initialSupply = Math.max(...data.map(item => item.amount))
 
-    // Calculate cumulative burn
-    let totalBurn = 0
-    chartData.forEach(item => {
-        if (item.diff > 0) {
-            totalBurn += item.diff
-        }
-        item.cumulativeBurn = totalBurn
-    })
-
-    const initialSupply = Math.max(...chartData.map(item => item.amount))
-
-    const chartConfig = {
-        labels: chartData.map(item => formatDate(item.date)),
+    const chartData = {
+        labels: data.map(item => formatDate(item.date)),
         datasets: [
             {
                 type: 'bar' as const,
                 label: 'Remaining Supply',
-                data: chartData.map(item => item.amount),
+                data: data.map(item => item.amount),
                 backgroundColor: 'rgba(255, 107, 107, 0.8)',
                 borderColor: '#FF6B6B',
                 borderWidth: 1,
@@ -72,11 +53,21 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
             {
                 type: 'bar' as const,
                 label: 'Burned Amount',
-                data: chartData.map(item => item.cumulativeBurn),
+                data: data.map(item => item.cumulativeBurn),
                 backgroundColor: 'rgba(76, 175, 80, 0.8)',
                 borderColor: '#4CAF50',
                 borderWidth: 1,
                 stack: 'stack0',
+            },
+            {
+                type: 'line' as const,
+                label: 'Burn Rate',
+                data: data.map(item => item.burnRate),
+                borderColor: '#FFA726',
+                backgroundColor: '#FFA726',
+                borderWidth: 2,
+                yAxisID: 'y1',
+                tension: 0.4
             }
         ]
     }
@@ -109,9 +100,9 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                 },
                 padding: 15,
                 callbacks: {
-                    title: (context) => formatFullDate(chartData[context[0].dataIndex].date),
+                    title: (context) => formatFullDate(data[context[0].dataIndex].date),
                     label: (context: any) => {
-                        const dataPoint = chartData[context.dataIndex]
+                        const dataPoint = data[context.dataIndex]
                         const percentage = ((dataPoint.cumulativeBurn / initialSupply) * 100).toFixed(4)
 
                         if (context.dataset.label === 'Burned Amount') {
@@ -154,6 +145,22 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                     color: 'rgba(255, 255, 255, 0.1)'
                 }
             },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'Burn Rate %',
+                    color: '#ffffff'
+                },
+                ticks: {
+                    color: '#ffffff'
+                },
+                grid: {
+                    drawOnChartArea: false
+                }
+            },
             x: {
                 stacked: true,
                 title: {
@@ -167,8 +174,8 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                 },
                 ticks: {
                     callback: function (this: any, tickValue: string | number, index: number) {
-                        if (index >= 0 && index < chartData.length) {
-                            return formatDate(chartData[index].date)
+                        if (index >= 0 && index < data.length) {
+                            return formatDate(data[index].date)
                         }
                         return ''
                     },
@@ -188,7 +195,7 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
 
     return (
         <div className="h-[800px]">
-            <Bar data={chartConfig} options={options} />
+            <Bar data={chartData} options={options} />
         </div>
     )
 } 
