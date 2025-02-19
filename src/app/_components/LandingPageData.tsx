@@ -39,9 +39,9 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 p-4">
           <DataBox
             title="Burn % of total supply"
-            value="1.49%"
+            value="1.62%"
             icon={<Flame className="h-4 w-4" />}
-            subtext="Updated daily"
+            subtext="Updated monthly"
             largeValueText={true}
             className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/30 h-full"
           />
@@ -49,7 +49,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
             title="Revenue distributed (to stakers)"
             value="$1.06M"
             icon={<Coins className="h-4 w-4" />}
-            subtext="Updated daily"
+            subtext="Updated monthly"
             tooltip="Total rewards distributed to LAVA stakers in USD"
             largeValueText={true}
             className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 h-full"
@@ -89,7 +89,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
 
         {/* Full-width pie chart container */}
         <div className="flex justify-center w-full ml-4 pr-7">
-          <TotalSupplyPieChart burnedPercentage={1.49} />
+          <TotalSupplyPieChart burnedPercentage={1.62} />
         </div>
 
         <div className="flex justify-center w-full mt-10 ml-6" style={{ paddingRight: '50px' }}>

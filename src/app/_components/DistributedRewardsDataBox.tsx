@@ -19,7 +19,7 @@ export default function DistributedRewardsDataBox() {
             value={isLoading ? "$464K USD" : formatRewardsToK(totalPastRewards)}
             tooltip={`Total distributed rewards: $${FormatNumber(totalPastRewards)} USD`}
             icon={<CircleDollarSign className="h-4 w-4" />}
-            subtext="Updated daily"
+            subtext="Updated live"
         />
     )
 } 
