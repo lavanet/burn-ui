@@ -123,7 +123,7 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
         scales: {
             y: {
                 stacked: true,
-                min: 983_000_000,
+                min: 500_000_000,
                 max: initialSupply,
                 title: {
                     display: true,
