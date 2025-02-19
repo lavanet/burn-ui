@@ -38,8 +38,24 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
     const data = calculateBurnData()
     const initialSupply = Math.max(...data.map(item => item.amount))
 
+    // Calculate average burn rate for predictions
+    const recentBurns = data.slice(-3) // Last 3 months
+    const avgMonthlyBurn = recentBurns.reduce((acc, item) => acc + item.diff, 0) / recentBurns.length
+
+    // Generate 6 months of predictions with proper dates
+    const lastDataPoint = data[data.length - 1]
+    const predictions = Array.from({ length: 6 }).map((_, index) => {
+        const predictedDate = new Date(lastDataPoint.date)
+        predictedDate.setMonth(predictedDate.getMonth() + index + 1)
+        return {
+            date: predictedDate.toISOString(),
+            amount: lastDataPoint.amount - (avgMonthlyBurn * (index + 1)),
+            predicted: true
+        }
+    })
+
     const chartData = {
-        labels: data.map(item => formatDate(item.date)),
+        labels: [...data.map(item => formatDate(item.date)), ...predictions.map(p => formatDate(p.date))],
         datasets: [
             {
                 type: 'bar' as const,
@@ -60,6 +76,15 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                 stack: 'stack0',
             },
             {
+                type: 'bar' as const,
+                label: 'Predicted Supply',
+                data: [...Array(data.length).fill(null), ...predictions.map(p => p.amount)],
+                backgroundColor: 'rgba(255, 107, 107, 0.3)',
+                borderColor: '#FF6B6B',
+                borderWidth: 1,
+                stack: 'stack0',
+            },
+            {
                 type: 'line' as const,
                 label: 'Burn Rate',
                 data: data.map(item => item.burnRate),
@@ -70,6 +95,10 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                 tension: 0.4
             }
         ]
+    }
+
+    const formatMicroLava = (amount: number) => {
+        return `${(amount * 1_000_000).toLocaleString()} µLAVA`
     }
 
     const options: ChartOptions<'bar'> = {
@@ -100,22 +129,49 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                 },
                 padding: 15,
                 callbacks: {
-                    title: (context) => formatFullDate(data[context[0].dataIndex].date),
+                    title: (context) => {
+                        const index = context[0].dataIndex
+                        const isPrediction = index >= data.length
+                        const date = isPrediction ? predictions[index - data.length].date : data[index].date
+                        return `${formatFullDate(date)}${isPrediction ? ' (Predicted)' : ''}`
+                    },
                     label: (context: any) => {
-                        const dataPoint = data[context.dataIndex]
-                        const percentage = ((dataPoint.cumulativeBurn / initialSupply) * 100).toFixed(4)
+                        const index = context.dataIndex
+                        const isPrediction = index >= data.length
+
+                        if (isPrediction && context.dataset.label === 'Predicted Supply') {
+                            const predictedAmount = predictions[index - data.length].amount
+                            return [
+                                `Predicted Supply: ${formatLava(predictedAmount)} LAVA`,
+                                `Predicted Date: ${formatFullDate(predictions[index - data.length].date)}`,
+                                `Predicted Burn: ${formatLava(avgMonthlyBurn)} LAVA`
+                            ]
+                        }
+
+                        const dataPoint = data[index]
+                        if (!dataPoint) return []
 
                         if (context.dataset.label === 'Burned Amount') {
                             return [
                                 `Total Burned: ${formatLava(dataPoint.cumulativeBurn)} LAVA`,
-                                `Burn Rate: ${percentage}%`,
-                                dataPoint.diff > 0 ? `Daily Burn: ${formatLava(dataPoint.diff)} LAVA` : ''
+                                `             ${formatMicroLava(dataPoint.cumulativeBurn)}`,
+                                `Burn Rate: ${dataPoint.burnRate.toFixed(4)}%`,
+                                dataPoint.diff > 0 ? [
+                                    `Daily Burn: ${formatLava(dataPoint.diff)} LAVA`,
+                                    `           ${formatMicroLava(dataPoint.diff)}`
+                                ].join('\n') : ''
                             ].filter(Boolean)
                         }
-                        return [
-                            `Remaining: ${formatLava(dataPoint.amount)} LAVA`,
-                            `Block: ${dataPoint.height}`
-                        ]
+
+                        if (context.dataset.label === 'Remaining Supply') {
+                            return [
+                                `Remaining: ${formatLava(dataPoint.amount)} LAVA`,
+                                `          ${formatMicroLava(dataPoint.amount)}`,
+                                `Block: ${dataPoint.height.toLocaleString()}`
+                            ]
+                        }
+
+                        return []
                     }
                 }
             }
@@ -174,6 +230,9 @@ export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLa
                 },
                 ticks: {
                     callback: function (this: any, tickValue: string | number, index: number) {
+                        if (index >= data.length) {
+                            return formatDate(predictions[index - data.length].date)
+                        }
                         if (index >= 0 && index < data.length) {
                             return formatDate(data[index].date)
                         }
