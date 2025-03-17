@@ -9,9 +9,15 @@ import sys
 from consts import RPC_URL
 
 DAILY_BLOCKS = {
-  "generated_at": "2025-02-18T15:03:12.867526+00:00",
-  "latest_height": 2236653,
+  "generated_at": "2025-03-17T15:57:55.842748+00:00",
+  "latest_height": 2405069,
   "blocks": [
+    {
+      "height": 2404825,
+      "time": "2025-03-17T14:59:56.655597+00:00",
+      "seconds_off": 3.344403,
+      "date": "2025-03-17"
+    },
     {
       "height": 2231220,
       "time": "2025-02-17T15:00:05.145270+00:00",
