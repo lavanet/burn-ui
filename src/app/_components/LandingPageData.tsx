@@ -10,14 +10,47 @@ import {
   CircleOff,
   Coins,
 } from "lucide-react";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TotalSupplyPieChart } from "./TotalSupplyPieChart";
 import { CurrentTotalSupplyDataBox } from "./CurrentTotalSupplyDataBox";
 import { CurrentCirculatingSupplyDataBox } from "./CurrentCirculatingSupplyDataBox";
 import { FAQ, FAQItem } from "@burn/components/faq";
 import DistributedRewardsDataBox from "./DistributedRewardsDataBox"
+import burnHistoryData from '../burn-rate/data/burn_history.json';
+
+interface BurnBlock {
+  day: string;
+  block: number;
+  supply: number;
+  supply_diff: number;
+  block_date: string;
+  target_date: string;
+}
 
 export default function LandingPageData() {
+  const calculateTotalBurned = () => {
+    return burnHistoryData.blocks.reduce((acc, curr) => acc + (curr.supply_diff || 0), 0);
+  };
+
+  const calculateBurnPercentage = () => {
+    const initialSupply = 1_000_000_000;
+    const totalBurned = calculateTotalBurned();
+    return (totalBurned / initialSupply) * 100;
+  };
+
+  const calculateAverageDailyBurn = () => {
+    if (burnHistoryData.blocks.length === 0) return 0;
+    const totalBurned = calculateTotalBurned();
+    const days = burnHistoryData.blocks.length * 30;
+    return totalBurned / days;
+  };
+
+  const calculateAnnualizedBurn = () => {
+    const totalBurned = calculateTotalBurned();
+    const latestMonthBurn = totalBurned / burnHistoryData.blocks.length;
+    return latestMonthBurn * 12;
+  };
+
   const faqList: FAQItem[] = [
     {
       question: "How does the burn mechanism work?",
@@ -39,9 +72,10 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 p-4">
           <DataBox
             title="Burn % of total supply"
-            value="1.62%"
+            value={`${calculateBurnPercentage().toFixed(2)}%`}
             icon={<Flame className="h-4 w-4" />}
             subtext="Updated monthly"
+            tooltip="Percentage of total initial LAVA supply that has been burned"
             largeValueText={true}
             className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/30 h-full"
           />
@@ -50,40 +84,40 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
             value="$1.06M"
             icon={<Coins className="h-4 w-4" />}
             subtext="Updated monthly"
-            tooltip="Total rewards distributed to LAVA stakers in USD"
+            tooltip="Total USD value of rewards distributed to LAVA stakers"
             largeValueText={true}
             className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 h-full"
           />
         </div>
 
-        <div style={{ marginTop: '10px' }}></div>
-        {/* Rest of the boxes in grid */}
         <Card style={{ margin: '15px' }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 gap-y-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
             <DistributedRewardsDataBox />
             <DataBox
               title="LAVA Burned"
-              value="14,911,406.3"
+              value={calculateTotalBurned().toLocaleString(undefined, { maximumFractionDigits: 1 })}
               icon={<CircleOff className="h-4 w-4" />}
               subtext="Updated daily"
+              tooltip="Total amount of LAVA tokens permanently removed from circulation since launch"
             />
             <DataBox
               title="Annualised LAVA Burn"
-              value="14,911,406.3"
+              value={calculateAnnualizedBurn().toLocaleString(undefined, { maximumFractionDigits: 1 })}
               icon={<TrendingUp className="h-4 w-4" />}
               subtext="Updated daily"
+              tooltip="Projected annual burn rate based on the latest month's burn (current month's burn × 12)"
             />
             <DataBox
               title="Average Daily LAVA Burn"
-              value="40,859.2"
+              value={calculateAverageDailyBurn().toLocaleString(undefined, { maximumFractionDigits: 1 })}
               icon={<Calendar className="h-4 w-4" />}
               subtext="Updated daily"
-              tooltip="Average daily burn amount in LAVA"
+              tooltip="Average amount of LAVA burned per day since the burn mechanism started"
             />
             <CurrentTotalSupplyDataBox />
             <CurrentCirculatingSupplyDataBox />
-          </div >
-        </Card >
+          </div>
+        </Card>
 
         <div style={{ marginTop: '40px' }}></div>
 
@@ -95,8 +129,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
         <div className="flex justify-center w-full mt-10 ml-6" style={{ paddingRight: '50px' }}>
           <FAQ faqList={faqList} className="w-full" />
         </div>
-
-      </div >
+      </div>
     </>
   );
 }
