@@ -97,21 +97,21 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
               title="LAVA Burned"
               value={calculateTotalBurned().toLocaleString(undefined, { maximumFractionDigits: 1 })}
               icon={<CircleOff className="h-4 w-4" />}
-              subtext="Updated daily"
+              subtext="Updated monthly"
               tooltip="Total amount of LAVA tokens permanently removed from circulation since launch"
             />
             <DataBox
               title="Annualised LAVA Burn"
               value={calculateAnnualizedBurn().toLocaleString(undefined, { maximumFractionDigits: 1 })}
               icon={<TrendingUp className="h-4 w-4" />}
-              subtext="Updated daily"
+              subtext="Updated monthly"
               tooltip="Projected annual burn rate based on the latest month's burn (current month's burn × 12)"
             />
             <DataBox
               title="Average Daily LAVA Burn"
               value={calculateAverageDailyBurn().toLocaleString(undefined, { maximumFractionDigits: 1 })}
               icon={<Calendar className="h-4 w-4" />}
-              subtext="Updated daily"
+              subtext="Updated monthly"
               tooltip="Average amount of LAVA burned per day since the burn mechanism started"
             />
             <CurrentTotalSupplyDataBox />
