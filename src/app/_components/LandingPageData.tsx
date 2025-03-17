@@ -4,7 +4,6 @@ import { DataBox } from "@burn/components/databox";
 import { Card, CardHeader, CardTitle, CardDescription } from "@burn/components/ui/card";
 import {
   Flame,
-  CircleDollarSign,
   TrendingUp,
   Calendar,
   CircleOff,
