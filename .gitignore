@@ -37,7 +37,6 @@ next-env.d.ts
 
 .next
 
-scripts/consts.py
 scripts/cache
 scripts/cache/*
 scripts/__pycache__
