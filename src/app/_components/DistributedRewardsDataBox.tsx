@@ -1,6 +1,6 @@
 "use client"
 
-import { usePoolsFetch } from '@burn/fetching/jsinfobe/hooks/usePoolsFetch'
+import { usePoolsFetch } from '@burn/fetching/pools/usePoolsFetch'
 import { FormatNumber } from '@burn/lib/formatting'
 import { DataBox } from '@burn/components/databox'
 import { CircleDollarSign } from "lucide-react"

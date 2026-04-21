@@ -7,7 +7,8 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { Card, CardContent, CardHeader, CardTitle } from "@burn/components/ui/card"
 import { Skeleton } from "@burn/components/ui/skeleton"
 import { Loader2 } from "lucide-react"
-import { useJsinfobeFetch } from '@burn/fetching/jsinfobe/hooks/useJsinfobeFetch'
+import { useInfoFetch } from '@burn/fetching/info/hooks/useInfoFetch'
+import { INFO_ENDPOINTS } from '@burn/fetching/info/consts'
 import { PieChart as PieChartIcon } from "lucide-react"
 
 const darkTheme = createTheme({
@@ -21,8 +22,8 @@ interface TotalSupplyPieChartProps {
 }
 
 export function TotalSupplyPieChart({ burnedPercentage }: TotalSupplyPieChartProps) {
-    const { data: totalSupplyStr, error, isLoading } = useJsinfobeFetch('supply/total');
-    const { data: circulatingSupplyStr, error: circulatingSupplyError, isLoading: circulatingSupplyLoading } = useJsinfobeFetch('supply/circulating');
+    const { data: totalSupplyStr, error, isLoading } = useInfoFetch<string>(INFO_ENDPOINTS.supplyTotal);
+    const { data: circulatingSupplyStr, error: circulatingSupplyError, isLoading: circulatingSupplyLoading } = useInfoFetch<string>(INFO_ENDPOINTS.supplyCirculating);
 
     // Use default values if loading or error
     const totalSupply = parseInt(totalSupplyStr || '985088593');

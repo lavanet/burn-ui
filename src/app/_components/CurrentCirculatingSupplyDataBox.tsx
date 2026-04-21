@@ -1,6 +1,7 @@
 "use client";
 
-import { useJsinfobeFetch } from '@burn/fetching/jsinfobe/hooks/useJsinfobeFetch';
+import { useInfoFetch } from '@burn/fetching/info/hooks/useInfoFetch';
+import { INFO_ENDPOINTS } from '@burn/fetching/info/consts';
 import { DataBox } from '@burn/components/databox';
 import LoadingIndicator from '@burn/components/modern/LoadingIndicator';
 import { ErrorDisplay } from '@burn/components/modern/ErrorDisplay';
@@ -8,7 +9,7 @@ import { FormatNumber, IsMeaningfulText } from '@burn/lib/formatting';
 import { CircleDot } from "lucide-react";
 
 export function CurrentCirculatingSupplyDataBox() {
-    const { data, isLoading, error } = useJsinfobeFetch<string>('supply/circulating');
+    const { data, isLoading, error } = useInfoFetch<string>(INFO_ENDPOINTS.supplyCirculating);
 
     if (isLoading) {
         return <DataBox

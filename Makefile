@@ -1,15 +1,15 @@
 localbe_run:
-	@export NEXT_PUBLIC_JSINFOBE_REST_URL=http://localhost:8081 && \
+	@export NEXT_PUBLIC_INFO_BASE_URL=http://localhost:8080 && \
 	export PORT=5500 && \
 	pnpm dev
 
 run:
-	@export NEXT_PUBLIC_JSINFOBE_REST_URL=https://jsinfo.mainnet.lavanet.xyz/ && \
+	@export NEXT_PUBLIC_INFO_BASE_URL=https://api-info.lavapro.xyz && \
 	export PORT=5500 && \
 	pnpm dev
 
 build:
-	@export NEXT_PUBLIC_JSINFOBE_REST_URL=https://jsinfo.mainnet.lavanet.xyz/ && \
+	@export NEXT_PUBLIC_INFO_BASE_URL=https://api-info.lavapro.xyz && \
 	pnpm build
 
 install:
