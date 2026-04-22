@@ -9,46 +9,52 @@ import {
   CircleOff,
   Coins,
 } from "lucide-react";
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { TotalSupplyPieChart } from "./TotalSupplyPieChart";
 import { CurrentTotalSupplyDataBox } from "./CurrentTotalSupplyDataBox";
 import { CurrentCirculatingSupplyDataBox } from "./CurrentCirculatingSupplyDataBox";
 import { FAQ, FAQItem } from "@burn/components/faq";
-import DistributedRewardsDataBox from "./DistributedRewardsDataBox"
-import burnHistoryData from '../burn-rate/data/burn_history.json';
+import DistributedRewardsDataBox from "./DistributedRewardsDataBox";
+import { useInfoFetch } from "@burn/fetching/info/hooks/useInfoFetch";
+import { INFO_ENDPOINTS } from "@burn/fetching/info/consts";
+import type { BurnRateResponse } from "@burn/fetching/info/types";
+import { calculateBurnData } from "../burn-rate/data/burnDataCalculator";
 
-interface BurnBlock {
-  day: string;
-  block: number;
-  supply: number;
-  supply_diff: number;
-  block_date: string;
-  target_date: string;
+// Match the old LandingPageData placeholder behaviour: while the burn
+// history loads, render the last-known totals we previously hard-coded
+// from the static JSON rather than flashing zeros.
+const PLACEHOLDER_TOTAL_BURNED = 34_835_977;
+const PLACEHOLDER_BURN_PERCENTAGE = 3.48;
+
+function formatBurnAmount(value: number): string {
+  return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
 }
 
 export default function LandingPageData() {
-  const calculateTotalBurned = () => {
-    return burnHistoryData.blocks.reduce((acc, curr) => acc + (curr.supply_diff || 0), 0);
-  };
+  const { data: burnRate } = useInfoFetch<BurnRateResponse>(INFO_ENDPOINTS.burnRate);
+  const burnData = calculateBurnData(burnRate);
+  const monthlyRows = burnData.length;
 
-  const calculateBurnPercentage = () => {
-    const initialSupply = 1_000_000_000;
-    const totalBurned = calculateTotalBurned();
-    return (totalBurned / initialSupply) * 100;
-  };
+  // Cumulative burn across the whole walked history lives on the last
+  // row; a missing/empty response falls back to the placeholder so the
+  // landing page stays populated during initial load.
+  const totalBurned = monthlyRows > 0
+    ? burnData[monthlyRows - 1].cumulativeBurn
+    : PLACEHOLDER_TOTAL_BURNED;
 
-  const calculateAverageDailyBurn = () => {
-    if (burnHistoryData.blocks.length === 0) return 0;
-    const totalBurned = calculateTotalBurned();
-    const days = burnHistoryData.blocks.length * 30;
-    return totalBurned / days;
-  };
+  const burnPercentage = monthlyRows > 0
+    ? burnData[monthlyRows - 1].burnRate
+    : PLACEHOLDER_BURN_PERCENTAGE;
 
-  const calculateAnnualizedBurn = () => {
-    const totalBurned = calculateTotalBurned();
-    const latestMonthBurn = totalBurned / burnHistoryData.blocks.length;
-    return latestMonthBurn * 12;
-  };
+  // Preserve the original heuristics: average per-day = total / (months * 30),
+  // annualised = last-month burn × 12.
+  const averageDailyBurn = monthlyRows > 0
+    ? totalBurned / (monthlyRows * 30)
+    : 0;
+
+  const annualizedBurn = monthlyRows > 0
+    ? (totalBurned / monthlyRows) * 12
+    : 0;
 
   const faqList: FAQItem[] = [
     {
@@ -71,7 +77,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 p-4">
           <DataBox
             title="Burn % of total supply"
-            value={`${calculateBurnPercentage().toFixed(2)}%`}
+            value={`${burnPercentage.toFixed(2)}%`}
             icon={<Flame className="h-4 w-4" />}
             subtext="Updated monthly"
             tooltip="Percentage of total initial LAVA supply that has been burned"
@@ -94,21 +100,21 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
             <DistributedRewardsDataBox />
             <DataBox
               title="LAVA Burned"
-              value={calculateTotalBurned().toLocaleString(undefined, { maximumFractionDigits: 1 })}
+              value={formatBurnAmount(totalBurned)}
               icon={<CircleOff className="h-4 w-4" />}
               subtext="Updated monthly"
               tooltip="Total amount of LAVA tokens permanently removed from circulation since launch"
             />
             <DataBox
               title="Annualised LAVA Burn"
-              value={calculateAnnualizedBurn().toLocaleString(undefined, { maximumFractionDigits: 1 })}
+              value={formatBurnAmount(annualizedBurn)}
               icon={<TrendingUp className="h-4 w-4" />}
               subtext="Updated monthly"
               tooltip="Projected annual burn rate based on the latest month's burn (current month's burn × 12)"
             />
             <DataBox
               title="Average Daily LAVA Burn"
-              value={calculateAverageDailyBurn().toLocaleString(undefined, { maximumFractionDigits: 1 })}
+              value={formatBurnAmount(averageDailyBurn)}
               icon={<Calendar className="h-4 w-4" />}
               subtext="Updated monthly"
               tooltip="Average amount of LAVA burned per day since the burn mechanism started"
@@ -122,7 +128,7 @@ In summary: across 4 years, 6.6% is total LAVA supply may be burned depending on
 
         {/* Full-width pie chart container */}
         <div className="flex justify-center w-full ml-4 pr-7">
-          <TotalSupplyPieChart burnedPercentage={1.62} />
+          <TotalSupplyPieChart burnedPercentage={burnPercentage} />
         </div>
 
         <div className="flex justify-center w-full mt-10 ml-6" style={{ paddingRight: '50px' }}>

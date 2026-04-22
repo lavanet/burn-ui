@@ -15,8 +15,7 @@ import {
     BarController,
     LineController
 } from 'chart.js'
-import burnHistory from '../data/burn_history.json'
-import { calculateBurnData } from '../data/burnDataCalculator'
+import type { BurnData } from '../data/burnDataCalculator'
 
 ChartJS.register(
     CategoryScale,
@@ -32,14 +31,14 @@ ChartJS.register(
 )
 
 interface BurnRateChartProps {
+    data: BurnData[]
     formatDate: (date: string) => string
     formatFullDate: (date: string) => string
     formatLava: (amount: number) => string
     formatLavaMillions: (amount: number) => string
 }
 
-export function BurnRateChart({ formatDate, formatFullDate, formatLava, formatLavaMillions }: BurnRateChartProps) {
-    const data = calculateBurnData()
+export function BurnRateChart({ data, formatDate, formatFullDate, formatLava, formatLavaMillions }: BurnRateChartProps) {
     const initialSupply = Math.max(...data.map(item => item.amount))
 
     // Calculate average burn rate for predictions
