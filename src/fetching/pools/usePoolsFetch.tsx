@@ -1,6 +1,11 @@
 import useSWR from 'swr'
 import axios from 'axios'
 
+// This is the only data source in burn-ui that isn't info-backed — it's a
+// separate AWS Lambda (burn-tracker) providing pool-level cumulative rewards.
+// Nothing in info replaces it today, so it stays as-is while the rest of the
+// jsinfo → info migration lands.
+
 interface ChainPool {
     id: number
     chain_id: string
@@ -50,9 +55,9 @@ export function usePoolsFetch(): PoolsFetchResult {
         'https://mcyumuxznb.execute-api.us-east-1.amazonaws.com/api/home/?format=json',
         fetcher,
         {
-            refreshInterval: 60000, // Refresh every minute
-            dedupingInterval: 30000, // Dedupe requests within 30 seconds
-            revalidateOnFocus: false // Don't revalidate on window focus
+            refreshInterval: 60000,
+            dedupingInterval: 30000,
+            revalidateOnFocus: false,
         }
     )
 
@@ -60,6 +65,6 @@ export function usePoolsFetch(): PoolsFetchResult {
         totalPastRewards: data ? parseFloat(data.total_past_rewards) : 0,
         isLoading,
         error: error || null,
-        data: data || null
+        data: data || null,
     }
 }

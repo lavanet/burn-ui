@@ -9,14 +9,15 @@ import {
     TableRow,
     TableCell
 } from "@burn/components/tables/SortableTable"
-import { calculateBurnData, getTableData } from '../data/burnDataCalculator'
+import type { BurnData } from '../data/burnDataCalculator'
 
 interface BurnRateTableProps {
+    data: BurnData[]
     formatDate: (date: string) => string
     formatLava: (amount: number) => string
 }
 
-export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
+export function BurnRateTable({ data, formatDate, formatLava }: BurnRateTableProps) {
     const formatBlockNumber = (num: number) => {
         return num.toLocaleString()
     }
@@ -32,8 +33,6 @@ export function BurnRateTable({ formatDate, formatLava }: BurnRateTableProps) {
     const formatULAVA = (amount: number) => {
         return `${(amount * 1_000_000_000_000).toLocaleString()} ULAVA`
     }
-
-    const data = getTableData()
 
     const columns = [
         {
