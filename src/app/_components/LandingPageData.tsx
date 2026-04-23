@@ -20,12 +20,6 @@ import { INFO_ENDPOINTS } from "@burn/fetching/info/consts";
 import type { BurnRateResponse } from "@burn/fetching/info/types";
 import { calculateBurnData } from "../burn-rate/data/burnDataCalculator";
 
-// Match the old LandingPageData placeholder behaviour: while the burn
-// history loads, render the last-known totals we previously hard-coded
-// from the static JSON rather than flashing zeros.
-const PLACEHOLDER_TOTAL_BURNED = 34_835_977;
-const PLACEHOLDER_BURN_PERCENTAGE = 3.48;
-
 function formatBurnAmount(value: number): string {
   return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
 }
@@ -41,26 +35,18 @@ export default function LandingPageData() {
   const burnData = calculateBurnData(burnRate);
   const monthlyRows = burnData.length;
 
-  // Cumulative burn across the whole walked history lives on the last
-  // row; a missing/empty response falls back to the placeholder so the
-  // landing page stays populated during initial load.
-  const totalBurned = monthlyRows > 0
-    ? burnData[monthlyRows - 1].cumulativeBurn
-    : PLACEHOLDER_TOTAL_BURNED;
-
-  const burnPercentage = monthlyRows > 0
-    ? burnData[monthlyRows - 1].burnRate
-    : PLACEHOLDER_BURN_PERCENTAGE;
+  // Cumulative burn lives on the last (newest) walked row. During the
+  // initial SWR fetch every derived stat is 0 — a brief flash before
+  // data lands is preferable to lying with stale hard-coded numbers
+  // (the previous PLACEHOLDER_* constants drifted further out of date
+  // on every monthly burn).
+  const totalBurned = monthlyRows > 0 ? burnData[monthlyRows - 1].cumulativeBurn : 0;
+  const burnPercentage = monthlyRows > 0 ? burnData[monthlyRows - 1].burnRate : 0;
 
   // Preserve the original heuristics: average per-day = total / (months * 30),
   // annualised = last-month burn × 12.
-  const averageDailyBurn = monthlyRows > 0
-    ? totalBurned / (monthlyRows * 30)
-    : 0;
-
-  const annualizedBurn = monthlyRows > 0
-    ? (totalBurned / monthlyRows) * 12
-    : 0;
+  const averageDailyBurn = monthlyRows > 0 ? totalBurned / (monthlyRows * 30) : 0;
+  const annualizedBurn = monthlyRows > 0 ? (totalBurned / monthlyRows) * 12 : 0;
 
   const faqList: FAQItem[] = [
     {
