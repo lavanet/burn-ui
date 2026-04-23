@@ -4,12 +4,12 @@ localbe_run:
 	pnpm dev
 
 run:
-	@export NEXT_PUBLIC_INFO_BASE_URL=https://api-info.lavapro.xyz && \
+	@export NEXT_PUBLIC_INFO_BASE_URL=https://api-info.lavanet.xyz && \
 	export PORT=5500 && \
 	pnpm dev
 
 build:
-	@export NEXT_PUBLIC_INFO_BASE_URL=https://api-info.lavapro.xyz && \
+	@export NEXT_PUBLIC_INFO_BASE_URL=https://api-info.lavanet.xyz && \
 	pnpm build
 
 install:

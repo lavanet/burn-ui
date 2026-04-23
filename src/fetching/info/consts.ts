@@ -1,4 +1,4 @@
-export const INFO_BASE_URL = process.env.NEXT_PUBLIC_INFO_BASE_URL || 'https://api-info.lavapro.xyz';
+export const INFO_BASE_URL = process.env.NEXT_PUBLIC_INFO_BASE_URL || 'https://api-info.lavanet.xyz';
 
 export const INFO_ENDPOINTS = {
     // GET /supply/total — plain text number, total LAVA supply
