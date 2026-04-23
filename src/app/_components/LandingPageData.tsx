@@ -31,7 +31,13 @@ function formatBurnAmount(value: number): string {
 }
 
 export default function LandingPageData() {
-  const { data: burnRate } = useInfoFetch<BurnRateResponse>(INFO_ENDPOINTS.burnRate);
+  // Full history (months=36 covers every snapshot the indexer emits).
+  // The landing stats (cumulative burn, burn %, annualised) are
+  // computed from the whole walk — a 12-row default would under-count
+  // the total burned by the older months that don't make the cut.
+  const { data: burnRate } = useInfoFetch<BurnRateResponse>(
+    `${INFO_ENDPOINTS.burnRate}?months=36`,
+  );
   const burnData = calculateBurnData(burnRate);
   const monthlyRows = burnData.length;
 

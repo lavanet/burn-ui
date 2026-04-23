@@ -255,7 +255,7 @@ export function BurnRateChart({ data, formatDate, formatFullDate, formatLava, fo
     }
 
     return (
-        <div className="h-[800px]">
+        <div className="h-[420px]">
             <Chart
                 type="bar"
                 data={chartData as any}

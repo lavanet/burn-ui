@@ -12,7 +12,13 @@ import { formatDate, formatFullDate } from '@burn/lib/dateFormatting'
 import { formatLava, formatLavaMillions } from '@burn/lib/numberFormatting'
 
 export default function BurnRatePage() {
-    const { data, isLoading, error } = useInfoFetch<BurnRateResponse>(INFO_ENDPOINTS.burnRate)
+    // Pull the full available history (info caps at 36 months, which
+    // covers every snapshot the indexer has emitted so far). Default
+    // months=12 on the endpoint would cut the chart off around the
+    // one-year mark and leave the detailed table similarly truncated.
+    const { data, isLoading, error } = useInfoFetch<BurnRateResponse>(
+        `${INFO_ENDPOINTS.burnRate}?months=36`,
+    )
 
     const chartData = calculateBurnData(data)
     const tableData = getTableData(data)
@@ -22,7 +28,7 @@ export default function BurnRatePage() {
         <div className="p-8 w-full min-h-screen">
             <div className="max-w-[1600px] mx-auto">
                 <h1 className="text-4xl font-bold mb-10 text-center text-white">LAVA Token Burn History</h1>
-                {/* <div className="mb-12">
+                <div className="mb-12">
                     {hasHistory && (
                         <BurnRateChart
                             data={chartData}
@@ -32,7 +38,7 @@ export default function BurnRatePage() {
                             formatLavaMillions={formatLavaMillions}
                         />
                     )}
-                </div> */}
+                </div>
 
                 <div className="mt-12">
                     <h2 className="text-3xl font-bold mb-8 text-white">Detailed History</h2>
