@@ -43,7 +43,7 @@ function LoadingIndicator({ loadingText = 'Loading', greyText = '', width = 20, 
         ...
       </span>
       <Image
-        src="https://lava-fe-assets.s3.amazonaws.com/loader-white.gif"
+        src="/loader-white.gif"
         width={width}
         height={height}
         alt='loader-white'
